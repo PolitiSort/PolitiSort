@@ -1,0 +1,4 @@
+x=dataset
+%tensorflow_version 1.x
+# display matplotlib plots
+%matplotlib inline
