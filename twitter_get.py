@@ -26,12 +26,12 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 with open(sys.argv[1], "r") as df, open(sys.argv[2], "w") as csvfile:
     writer = csv.writer(csvfile)
-    writer.writerow(["handle", "name", "description", "friends_count", "followers_count", "status", "isBot"])
+    writer.writerow(["handle", "name", "description", "friends_count", "followers_count", "status", "isDem"])
     for i in tqdm.tqdm(df.readlines()):
         id, kind = i.split("\t")
 
         # User Info
-        kind = 1 if str(kind)[0] == "b" or str(kind)[0] == "1" else 0
+        kind = 1 if str(kind)[0] == "d" or str(kind)[0] == "D" else 0
         try:
             user_obj = api.get_user(id)
             user_handle = user_obj.screen_name
