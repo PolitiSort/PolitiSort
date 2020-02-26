@@ -14,13 +14,13 @@ class Tokenization():
 				self.__vocab_rev[self.__counter] = word
 				token = self.__counter
 				self.__counter += 1
-			arrayOfNums.append(token+1)
+			arrayOfNums.append(token)
 		return arrayOfNums
 
 	def getStrings(self, nums):
 		arrayOfStrings = []
 		for number in nums:
-			string = self.__vocab_rev[number-1]
+			string = self.__vocab_rev[number]
 			arrayOfStrings.append(string)
 		return arrayOfStrings
 
