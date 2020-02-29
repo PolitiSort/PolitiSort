@@ -1,3 +1,4 @@
+import csv
 class Tokenization():
 	def __init__(self):
 		self.__vocab = {}
@@ -24,8 +25,37 @@ class Tokenization():
 			arrayOfStrings.append(string)
 		return arrayOfStrings
 
+
+class DataHandler():
+	def __init__(self, csvInput, tokenizer: Tokenization):
+		self.tokenizer = tokenizer
+		self.__readCSV = csv.reader(open(csvInput))
+		self.__encodedData = {}
+		self.__isCompiled = False
+
+	def __call__(self):
+		return self.__encodedData
+
+	def compile(self, retreiveFields):
+		for field in retreiveFields:
+			arrayThing = []
+			for row in self.__readCSV:
+				arrayThing.append(self.tokenizer.tokenize(row[field]))
+			self.__encodedData.update({field:arrayThing})
+		self.__isCompiled = True
+
+
 if __name__ == "__main__":
-	testTokenConverter = Tokenization()
+	TokenConverter = Tokenization()
+	DataThing = DataHandler('dummy.csv', TokenConverter)
+	DataThing.compile()
+	'''
+'	testTokenConverter = Tokenization()
 	tokens = testTokenConverter.tokenize("hi my name is bob and I like cheese")
 	print(tokens)
+	moretokens = testTokenConverter.tokenize("hi cheese")
+	print(testTokenConverter.tokenize("hi"))
+	print(moretokens)
 	print(testTokenConverter.getStrings(tokens))
+	print(testTokenConverter.getStrings(moretokens))
+	'''
