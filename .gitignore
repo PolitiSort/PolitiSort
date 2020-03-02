@@ -132,4 +132,6 @@ dmypy.json
 
 # Secrets
 twitter_get_secret.py
-
+.idea/
+.DS_Store
+Politisort/.DS_Store
