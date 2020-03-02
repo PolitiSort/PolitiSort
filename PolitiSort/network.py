@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from keras.models import Model
 from keras.layers import Input, LSTM, Lambda, concatenate
 import keras.backend as K
