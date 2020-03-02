@@ -133,5 +133,10 @@ dmypy.json
 !*.secret
 twitter_get_secret.py
 
+# Ignore Misc IDE Files
+.idea/
+.DS_Store
+Politisort/.DS_Store
+
 # Vim Swaps
 *.swp
