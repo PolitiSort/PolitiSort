@@ -43,7 +43,7 @@ with open(sys.argv[1], "r") as df, open(sys.argv[2], "w") as csvfile:
             continue
 
         # Tweets
-        tweets = [i.text for i in api.user_timeline(id, count=1000)]
+        tweets = [i.text for i in api.user_timeline(id, count=200)]
 
         # Compile!
         for tweet in tweets:

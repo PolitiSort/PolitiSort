@@ -1,32 +1,35 @@
 import numpy as np
 from keras.models import Model
-from keras.layers import Input, Dense, LSTM, Lambda, Dropout, concatenate
+from keras.optimizers import Adam
+from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, concatenate
 import keras.backend as K
 from keras.preprocessing.sequence import pad_sequences
 
 class PolitiNet(object):
-    def __init__(self, maxDesc=15, maxStatus=15):
+    def __init__(self, maxDesc=15, maxStatus=15, lr=3e-2):
         self.__maxDesc = maxDesc
         self.__maxStatus = maxStatus
         self.model = self.__build()
-        self.model.compile("adam", loss="binary_crossentropy", metrics=["acc"])
+        self.model.compile(Adam(lr=lr), loss="binary_crossentropy", metrics=["acc"])
 
     def __build(self):
         # inp_bio = Input(shape=(self.__maxDesc,)) 
 
         inp_status = Input(shape=(self.__maxStatus,)) 
 
+        inp_masked = Masking(mask_value=0.0)(inp_status)
+
         # inp_exp_bio = Lambda(lambda x: K.expand_dims(x, axis=-1))(inp_bio)
 
-        inp_exp_status = Lambda(lambda x: K.expand_dims(x, axis=-1))(inp_status)
+        inp_exp_status = Lambda(lambda x: K.expand_dims(x, axis=-1))(inp_masked)
 
-        net1 = LSTM(50, return_sequences=True)(inp_exp_status)
-        net1 = LSTM(50, return_sequences=True)(net1)
+        net1 = LSTM(64, return_sequences=True, activation="tanh")(inp_exp_status)
+        net1 = LSTM(32, return_sequences=True, activation="tanh")(net1)
+        net1 = LSTM(16, activation="tanh")(net1)
 
-        net2 = LSTM(32, return_sequences=True)(net1)
-        net2 = LSTM(32)(net2)
-
-        net3 = Dense(32, activation="relu")(net2)
+        net3 = Dense(128, activation="tanh")(net1)
+        net3 = Dense(32, activation="tanh")(net1)
+        net3 = Dense(32, activation="tanh")(net3)
         net3 = Dense(2, activation="softmax")(net3)
 
         model = Model(inputs=[inp_status], outputs=[net3]) 

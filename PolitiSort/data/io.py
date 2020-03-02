@@ -5,7 +5,7 @@ class Tokenizer(object):
     def __init__(self):
         self.__vocab = {}
         self.__vocab_rev = {}
-        self.__counter = 0
+        self.__counter = 1
 
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
