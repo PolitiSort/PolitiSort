@@ -127,13 +127,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.gitsecret/keys/random_seed
-!*.secret
 
 # Secrets
+.gitsecret/keys/random_seed
+!*.secret
 twitter_get_secret.py
 
-# Zachs bad IDE created stuff
+# Ignore Misc IDE Files
 .idea/
 .DS_Store
 Politisort/.DS_Store
+
+# Vim Swaps
+*.swp
