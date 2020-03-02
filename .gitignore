@@ -132,6 +132,8 @@ dmypy.json
 
 # Secrets
 twitter_get_secret.py
+
+# Zachs bad IDE created stuff
 .idea/
 .DS_Store
 Politisort/.DS_Store
