@@ -22,7 +22,7 @@ class PolitiNet(object):
         net2 = LSTM(32, return_sequences=True)(inp_exp)
         net2 = LSTM(32)(net2)
 
-        net3 = Dense(128, activation="ReLU")(net2)
+        net3 = Dense(128, activation="relu")(net2)
         net3 = Dense(2, activation="softmax")(net3)
 
         model = Model(inputs=[inp_exp_bio, inp_exp_status], outputs=[net3]) 

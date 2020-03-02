@@ -127,9 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.gitsecret/keys/random_seed
-!*.secret
 
 # Secrets
+.gitsecret/keys/random_seed
+!*.secret
 twitter_get_secret.py
 
+# Vim Swaps
+*.swp
