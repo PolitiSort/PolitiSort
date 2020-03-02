@@ -47,7 +47,7 @@ class DataHandler(object):
             for row in csvreader:
                 for field in retreiveFields:
                     if field == "isDem":
-                        self.__encodedData[field].append([0,1] if row['isDem']==1 else [1,0])
+                        self.__encodedData[field].append([0,1] if row['isDem']=='1' else [1,0])
                     elif field == "status" or field == "description":
                         self.__encodedData[field].append(self.tokenizer.tokenize(row[field]))
                     else:
