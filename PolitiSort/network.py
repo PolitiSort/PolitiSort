@@ -6,7 +6,7 @@ import keras.backend as K
 from keras.preprocessing.sequence import pad_sequences
 
 class PolitiNet(object):
-    def __init__(self, maxDesc=15, maxStatus=15, lr=3e-2):
+    def __init__(self, maxDesc=15, maxStatus=15, lr=5e-2):
         self.__maxDesc = maxDesc
         self.__maxStatus = maxStatus
         self.model = self.__build()
