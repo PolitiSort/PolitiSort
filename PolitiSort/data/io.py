@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+from tqdm import tqdm
 from keras.preprocessing.sequence import pad_sequences
 from collections import defaultdict
 
@@ -48,14 +49,13 @@ class GANHandler(object):
         return np.random.normal(0, 1, (batch,))
 
     def step(self, batch_size, prev=None):
-        assert int(batch_size/2) == batch_size/2, "Batch size must be divisible by 2!!"
+        halfbatch = int(batch_size/2)
+        assert halfbatch == batch_size/2, "Batch size must be divisible by 2!!"
         if not prev:
-            prev = self.noise(batch_size/2)
-        new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"]-1), batch_size/2)
+            prev = self.noise(halfbatch)
+        new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"])-1, halfbatch)
         new = self.__encodedData["bigrams"][new_indxs]
-        zeros = np.zeros(batch_size/2)
-        ones = np.ones(batch_size/2)
-        return prev, new, zeros, ones
+        return prev, new
         
     def compile(self, retreiveFields=["status"]):
         with open(self.__csvInput, 'r') as df:
@@ -68,10 +68,11 @@ class GANHandler(object):
                         self.__encodedData[field].append(self.tokenizer.tokenize(row[field]))
                     else:
                         self.__encodedData[field].append(self.tokenizer.tokenize(row[field], by_char=True))
-        for i in range(len(self.__encodedData["status"])-2):
-            check = [self.__encodedData["status"][i], self.__encodedData["status"][i+1]]
-            if check not in self.__encodedData["bigrams"]:
-                self.__encodedData["bigrams"].append(check)
+        for indx, i in tqdm(enumerate(self.__encodedData["status"]), total=len(self.__encodedData["status"])):
+            for e in range(len(i)-2):
+                check = [self.__encodedData["status"][indx][e], self.__encodedData["status"][indx][e+1]]
+                if check not in self.__encodedData["bigrams"]:
+                    self.__encodedData["bigrams"].append(check)
         self.__encodedData["bigrams"] = np.array(self.__encodedData["bigrams"])
         # self.__encodedData["status"] = pad_sequences(self.__encodedData["status"], maxlen)
         # self.__encodedData["description"] = pad_sequences(self.__encodedData["description"], maxlen)
