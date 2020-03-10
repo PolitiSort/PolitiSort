@@ -63,7 +63,7 @@ class PolitiGen(object):
         """
         model = Sequential()
         model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32), input_shape=(1,))
+        #model.add(Dense(32), input_shape=(1,))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
         model.add(Conv1D(64, kernel_size=3, strides=2, padding="same"))
