@@ -61,22 +61,13 @@ class PolitiGen(object):
         """
         model = Sequential()
         #model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32, input_shape=(2,)))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dropout(0.25))
+        model.add(Dense(32, input_shape=(2,), activation="relu"))
 
-        model.add(Dense(64))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dense(64, activation="relu"))
 
-        model.add(Dropout(0.25))
-        model.add(Dense(128))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dense(128, activation="relu"))
 
-        model.add(Dropout(0.25))
-        model.add(Dense(256))
-        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(256, activation="relu"))
         model.add(LeakyReLU(alpha=0.2))
 
         model.add(Dropout(0.25))
@@ -95,14 +86,11 @@ class PolitiGen(object):
         model = Sequential()
 
         model.add(Dense(64, activation="relu", input_shape=noise_shape))
-        model.add(Dense(128))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dense(64))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Dense(1))
-        model.add(Activation("tanh"))
+        # model.add(Dense(128, activation="tanh"))
+        # model.add(Dense(128, activation="tanh"))
+        # model.add(Dense(64, activation="tanh"))
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(1, activation="relu"))
         return model
 
     def __compile(self):
@@ -153,11 +141,13 @@ class PolitiGen(object):
             d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
             g_loss = self.comb.train_on_batch(noise, full_ones)
 
-            generated_pairs_translated = [data.tokenizer._get_word(e) for e in generated_pairs[0]]
+            generated_pairs_translated = data.translate(generated_pairs[0])
 
-            breakpoint()
             if i%reporting == 0:
-                print("i={}, Disc acc (r): {}, Disc acc (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[1], d_loss_fake[1], g_loss, str(generated_pairs_translated)))
+                if not generated_pairs_translated[1]:
+                    breakpoint()
+                print("i={}, Disc acc (r): {}, Disc acc (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated)))
+                # breakpoint()
             
 
 if __name__ == "__main__":
