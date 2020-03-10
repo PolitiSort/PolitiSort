@@ -139,6 +139,7 @@ class PolitiGen(object):
         return generator, discriminator, combined
 
 
+
 if __name__ == "__main__":
     TestPolyGen = PolitiGen()
     TestPolyGen.build_combined()
