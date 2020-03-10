@@ -10,6 +10,7 @@ from keras.layers import UpSampling2D, Conv2D, LeakyReLU, Activation
 import keras.backend as K
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential, Model
+from tqdm import tqdm
 from .data.io import GANHandler
 
 
@@ -139,9 +140,9 @@ class PolitiGen(object):
         # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
 
-    def train(self, data:GANHandler, iterations=10, batch_size=128, save_interval=50):
+    def train(self, data:GANHandler, iterations=1024, batch_size=128, reporting=50):
 
-        for i in range(iterations):
+        for i in tqdm(range(iterations)):
             inp, actual_pairs, zeros, ones, noise, full_ones = data.step(batch_size)
             generated_results = self.gen.predict(inp)
             generated_pairs = []
@@ -151,9 +152,13 @@ class PolitiGen(object):
             d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
             d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
             g_loss = self.comb.train_on_batch(noise, full_ones)
+
+            generated_pairs_translated = [data.tokenizer._get_word(e) for e in generated_pairs[0]]
+
             breakpoint()
-
-
+            if i%reporting == 0:
+                print("i={}, Disc acc (r): {}, Disc acc (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[1], d_loss_fake[1], g_loss, str(generated_pairs_translated)))
+            
 
 if __name__ == "__main__":
     TestPolyGen = PolitiGen()

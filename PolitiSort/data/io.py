@@ -14,6 +14,9 @@ class Tokenizer(object):
     def _counter(self):
         return self.__counter
 
+    def _get_word(self, index:int):
+        return self.__vocab_rev.get(int(index))
+
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
         arrayOfNums = []
