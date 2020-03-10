@@ -162,4 +162,3 @@ class PolitiGen(object):
 
 if __name__ == "__main__":
     TestPolyGen = PolitiGen()
-    TestPolyGen.build_combined()
