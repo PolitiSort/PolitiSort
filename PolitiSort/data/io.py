@@ -1,4 +1,7 @@
 import csv
+import numpy as np
+from tqdm import tqdm
+from keras.preprocessing.sequence import pad_sequences
 from collections import defaultdict
 
 class Tokenizer(object):
@@ -6,6 +9,10 @@ class Tokenizer(object):
         self.__vocab = {}
         self.__vocab_rev = {}
         self.__counter = 1
+
+    @property
+    def _counter(self):
+        return self.__counter
 
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
@@ -28,6 +35,49 @@ class Tokenizer(object):
                 string = self.__vocab_rev[number]
                 arrayOfStrings.append(string)
         return arrayOfStrings
+
+
+class GANHandler(object):
+    def __init__(self, csvInput, tokenizer:Tokenizer, batch_size:int=32):
+        self.tokenizer = tokenizer
+        self.__csvInput = csvInput
+        self.__encodedData = defaultdict(list)
+        self.__isCompiled = False
+
+    @staticmethod
+    def noise(batch:int):
+        return np.random.normal(0, 1, (batch,))
+
+    def step(self, batch_size, prev=None):
+        halfbatch = int(batch_size/2)
+        assert halfbatch == batch_size/2, "Batch size must be divisible by 2!!"
+        if not prev:
+            prev = self.noise(halfbatch)
+        new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"])-1, halfbatch)
+        new = self.__encodedData["bigrams"][new_indxs]
+        return prev, new
+        
+    def compile(self, retreiveFields=["status"]):
+        with open(self.__csvInput, 'r') as df:
+            csvreader = csv.DictReader(df)
+            for row in csvreader:
+                for field in retreiveFields:
+                    if field == "isDem":
+                        self.__encodedData[field].append([0,1] if row['isDem']=='1' else [1,0])
+                    elif field == "status" or field == "description":
+                        self.__encodedData[field].append(self.tokenizer.tokenize(row[field]))
+                    else:
+                        self.__encodedData[field].append(self.tokenizer.tokenize(row[field], by_char=True))
+        for indx, i in tqdm(enumerate(self.__encodedData["status"]), total=len(self.__encodedData["status"])):
+            for e in range(len(i)-2):
+                check = [self.__encodedData["status"][indx][e], self.__encodedData["status"][indx][e+1]]
+                if check not in self.__encodedData["bigrams"]:
+                    self.__encodedData["bigrams"].append(check)
+        self.__encodedData["bigrams"] = np.array(self.__encodedData["bigrams"])
+        # self.__encodedData["status"] = pad_sequences(self.__encodedData["status"], maxlen)
+        # self.__encodedData["description"] = pad_sequences(self.__encodedData["description"], maxlen)
+
+        self.__isCompiled = True
 
 
 class DataHandler(object):
