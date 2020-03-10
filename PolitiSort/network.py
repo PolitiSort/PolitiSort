@@ -1,7 +1,7 @@
 import numpy as np
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape
+from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape, concatenate
 # Dependencies used in the version of Politisort that takes Bios into account
 # from keras.layers import concatenate, LeakyReLU
 from keras.layers import UpSampling2D, Conv2D, LeakyReLU, Activation
@@ -10,6 +10,7 @@ from keras.layers import UpSampling2D, Conv2D, LeakyReLU, Activation
 import keras.backend as K
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential, Model
+from .data.io import GANHandler
 
 
 class PolitiNet(object):
@@ -46,14 +47,10 @@ class PolitiNet(object):
     def fit(self, handler, epochs=10, batch_size=32, val_split=0.05):
         input_data = handler()
         self.model.fit(x=[pad_sequences(input_data["status"], maxlen=self.__maxStatus)], y=[input_data["isDem"]], epochs=epochs, batch_size=batch_size, validation_split=val_split, shuffle=True)
-##############################################################
-#
-#
-#
-##############################################################
+
 class PolitiGen(object):
     def __init__(self):
-        self.model = self.build_combined()
+        self.gen, self.desc, self.comb = self.__compile()
 
     def __build_discriminator(self):
         """
@@ -63,20 +60,24 @@ class PolitiGen(object):
         """
         model = Sequential()
         #model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32), input_shape=(1,))
+        model.add(Dense(32, input_shape=(2,)))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
+
         model.add(Dense(64))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
+
         model.add(Dropout(0.25))
         model.add(Dense(128))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
+
         model.add(Dropout(0.25))
         model.add(Dense(256))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
+
         model.add(Dropout(0.25))
         model.add(Dense(1, activation='sigmoid'))
         return model
@@ -103,7 +104,7 @@ class PolitiGen(object):
         model.add(Activation("tanh"))
         return model
 
-    def build_combined(self):
+    def __compile(self):
         """
         Puts together a model that combines the discriminator and generator models.
 
@@ -129,14 +130,28 @@ class PolitiGen(object):
         discriminator.trainable = False
 
         # The discriminator takes generated words as input and determines validity
-        valid = discriminator(word)
+        validity = discriminator(concatenate([noise, word]))
 
         # The combined model  (stacked generator and discriminator) takes
         # noise as input => generates words => determines validity
-        combined = Model(inputs=noise, outputs=valid)
+        combined = Model(inputs=noise, outputs=validity)
         combined.compile(loss='binary_crossentropy', optimizer=optimizer)
-        print(generator.summary(), discriminator.summary(), combined.summary())
+        # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
+
+    def train(self, data:GANHandler, iterations=10, batch_size=128, save_interval=50):
+
+        for i in range(iterations):
+            inp, actual_pairs, zeros, ones, noise, full_ones = data.step(batch_size)
+            generated_results = self.gen.predict(inp)
+            generated_pairs = []
+            for indx, e in enumerate(generated_results):
+                generated_pairs.append([inp[indx], e[0]])
+            generated_pairs = np.array(generated_pairs)
+            d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
+            d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
+            g_loss = self.comb.train_on_batch(noise, full_ones)
+            breakpoint()
 
 
 

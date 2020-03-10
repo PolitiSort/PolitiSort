@@ -1,5 +1,5 @@
 from PolitiSort.data.io import Tokenizer, DataHandler, GANHandler
-from PolitiSort.network import PolitiNet
+from PolitiSort.network import PolitiNet, PolitiGen
 import pickle
 
 
@@ -10,9 +10,6 @@ import pickle
     # pickle.dump(handler, df)
 with open("DH.GANHandler", "rb") as df:
     handler = pickle.load(df)
-print(handler.step(4))
-breakpoint()
-net = PolitiNet(46,46)
-net.fit(handler, epochs=1000, batch_size=128, val_split=0.00)
-
+net = PolitiGen()
+net.train(handler, batch_size=4)
 

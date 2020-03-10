@@ -46,16 +46,20 @@ class GANHandler(object):
 
     @staticmethod
     def noise(batch:int):
-        return np.random.normal(0, 1, (batch,))
+        return np.random.randint(0, 20000, (batch,))
 
     def step(self, batch_size, prev=None):
+        assert self.__isCompiled, "Uncompiled Handler! Call GANHandler().compile()"
         halfbatch = int(batch_size/2)
         assert halfbatch == batch_size/2, "Batch size must be divisible by 2!!"
         if not prev:
             prev = self.noise(halfbatch)
         new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"])-1, halfbatch)
         new = self.__encodedData["bigrams"][new_indxs]
-        return prev, new
+        zeros = np.zeros(halfbatch)
+        ones = np.ones(halfbatch)
+        full_ones = np.ones(batch_size)
+        return prev, new, zeros, ones, self.noise(batch_size), full_ones
         
     def compile(self, retreiveFields=["status"]):
         with open(self.__csvInput, 'r') as df:
