@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from keras.models import Model
 from keras.optimizers import Adam
@@ -61,14 +62,14 @@ class PolitiGen(object):
         """
         model = Sequential()
         #model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32, input_shape=(2,), activation="relu"))
+        model.add(Dense(32, input_shape=(2,), activation="tanh"))
 
-        model.add(Dense(64, activation="relu"))
+        model.add(Dense(64, activation="tanh"))
 
-        model.add(Dense(128, activation="relu"))
+        model.add(Dense(128, activation="tanh"))
 
-        model.add(Dense(256, activation="relu"))
-        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dense(256, activation="tanh"))
+        model.add(Dense(256, activation="tanh"))
 
         model.add(Dropout(0.25))
         model.add(Dense(1, activation='sigmoid'))
@@ -85,12 +86,12 @@ class PolitiGen(object):
 
         model = Sequential()
 
-        model.add(Dense(64, activation="relu", input_shape=noise_shape))
+        model.add(Dense(64, activation="tanh", input_shape=noise_shape))
+        model.add(Dense(128, activation="tanh"))
         # model.add(Dense(128, activation="tanh"))
-        # model.add(Dense(128, activation="tanh"))
-        # model.add(Dense(64, activation="tanh"))
-        model.add(Dense(64, activation="relu"))
-        model.add(Dense(1, activation="relu"))
+        model.add(Dense(64, activation="tanh"))
+        model.add(Dense(32, activation="tanh"))
+        model.add(Dense(1, activation="sigmoid"))
         return model
 
     def __compile(self):
@@ -100,7 +101,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(0.0002, 0.5)
+        optimizer = Adam(3e-2)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -128,27 +129,26 @@ class PolitiGen(object):
         # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
 
-    def train(self, data:GANHandler, iterations=1024, batch_size=128, reporting=50):
+    def train(self, data:GANHandler, epochs=10, iterations=1024, batch_size=128, reporting=50):
 
-        for i in tqdm(range(iterations)):
-            inp, actual_pairs, zeros, ones, noise, full_ones = data.step(batch_size)
-            generated_results = self.gen.predict(inp)
-            generated_pairs = []
-            for indx, e in enumerate(generated_results):
-                generated_pairs.append([inp[indx], e[0]])
-            generated_pairs = np.array(generated_pairs)
-            d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
-            d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
-            g_loss = self.comb.train_on_batch(noise, full_ones)
+        for epoch in range(epochs):
+            print("Epoch {}/{}".format(epoch+1, epochs))
+            for i in tqdm(range(iterations)):
+                inp, actual_pairs, zeros, ones, noise, full_ones = data.step(batch_size)
+                generated_results = self.gen.predict(inp)
+                generated_pairs = []
+                for indx, e in enumerate(generated_results):
+                    generated_pairs.append([inp[indx], e[0]])
+                generated_pairs = np.array(generated_pairs)
+                d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
+                d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
+                g_loss = self.comb.train_on_batch(noise, full_ones)
 
-            generated_pairs_translated = data.translate(generated_pairs[0])
-
-            if i%reporting == 0:
-                if not generated_pairs_translated[1]:
-                    breakpoint()
-                print("i={}, Disc acc (r): {}, Disc acc (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated)))
-                # breakpoint()
-            
+                generated_pairs_translated = data.translate(generated_pairs[0])
+                if i%reporting == 0:
+                    print("i={}, Disc loss (r): {}, Disc loss (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated)))
+                    # breakpoint()
+                
 
 if __name__ == "__main__":
     TestPolyGen = PolitiGen()

@@ -52,7 +52,7 @@ class GANHandler(object):
         return np.random.randint(0, 20000, (batch,))
 
     def translate(self, gen_pairs:list):
-        return [self.tokenizer._get_word(e*1e4) for e in gen_pairs]
+        return [self.tokenizer._get_word(e*1e5) for e in gen_pairs]
 
     def step(self, batch_size, prev=None):
         assert self.__isCompiled, "Uncompiled Handler! Call GANHandler().compile()"
@@ -65,7 +65,7 @@ class GANHandler(object):
         zeros = np.zeros(halfbatch)
         ones = np.ones(halfbatch)
         full_ones = np.ones(batch_size)
-        return prev*1e-4, new*1e-4, zeros, ones, self.noise(batch_size)*1e-4, full_ones
+        return prev*1e-5, new*1e-5, zeros, ones, self.noise(batch_size)*1e-5, full_ones
         
     def compile(self, retreiveFields=["status"]):
         with open(self.__csvInput, 'r') as df:
