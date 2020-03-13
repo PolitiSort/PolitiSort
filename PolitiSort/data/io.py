@@ -6,8 +6,8 @@ from collections import defaultdict
 
 class Tokenizer(object):
     def __init__(self):
-        self.__vocab = {}
-        self.__vocab_rev = {}
+        self.__vocab = {0:"{{URL}}"}
+        self.__vocab_rev = {"{{URL}}":0}
         self.__counter = 1
 
     @property
@@ -21,6 +21,11 @@ class Tokenizer(object):
         arrayOfStrings = string.split() if not by_char else list(string)
         arrayOfNums = []
         for word in arrayOfStrings:
+            word = word.strip().strip(".").strip("!").strip("?").strip("/")
+            if len(word)>=5:
+                if "https" in word:
+                    arrayOfNums.append(0)
+                    pass
             token = self.__vocab.get(word.lower())
             if not token:
                 self.__vocab[word.lower()] = self.__counter

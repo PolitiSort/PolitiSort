@@ -10,6 +10,7 @@ import pickle
     # pickle.dump(handler, df)
 with open("DH.GANHandler", "rb") as df:
     handler = pickle.load(df)
+# breakpoint()
 net = PolitiGen()
 net.train(handler, iterations=10248, batch_size=128, reporting=256)
 
