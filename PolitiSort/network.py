@@ -1,3 +1,4 @@
+import math
 import random
 import numpy as np
 from keras.models import Model
@@ -16,12 +17,13 @@ from .data.io import GANHandler
 
 
 class PolitiNet(object):
-    def __init__(self, maxdesc=15, maxstatus=15, lr=5e-3):
+    def __init__(self, handler:GANHandler, maxdesc=15, maxstatus=15, lr=5e-3):
         self.__maxDesc = maxdesc
         self.__maxStatus = maxstatus
         self.modelGenerator = None
         self.modelDiscriminator = None
         self.model.compile(Adam(lr=lr), loss="binary_crossentropy", metrics=["acc"])
+        self.handler = handler
 
     def __build(self):
         # inp_bio = Input(shape=(self.__maxDesc,)) 
@@ -51,7 +53,8 @@ class PolitiNet(object):
         self.model.fit(x=[pad_sequences(input_data["status"], maxlen=self.__maxStatus)], y=[input_data["isDem"]], epochs=epochs, batch_size=batch_size, validation_split=val_split, shuffle=True)
 
 class PolitiGen(object):
-    def __init__(self):
+    def __init__(self, handler:GANHandler):
+        self.handler = handler
         self.gen, self.desc, self.comb = self.__compile()
 
     def __build_discriminator(self):
@@ -75,6 +78,10 @@ class PolitiGen(object):
         model.add(Dense(1, activation='sigmoid'))
         return model
 
+    def __generator_activation(self, x):
+        base = 10**(math.ceil(math.log(self.handler.tokenizer._counter, 10)))
+        return (math.e**(x))/((1/(self.handler.tokenizer._counter/base))*math.e**(x)+1)
+
     def __build_generator(self):
         """
         Put together a model that takes in one-dimensional noise and outputs one-dimensional
@@ -91,7 +98,8 @@ class PolitiGen(object):
         # model.add(Dense(128, activation="tanh"))
         model.add(Dense(64, activation="tanh"))
         model.add(Dense(32, activation="tanh"))
-        model.add(Dense(1, activation="sigmoid"))
+        model.add(Dense(1))
+        model.add(Activation(self.__generator_activation))
         return model
 
     def __compile(self):
@@ -101,7 +109,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(3e-2)
+        optimizer = Adam(3e-3)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -129,12 +137,12 @@ class PolitiGen(object):
         # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
 
-    def train(self, data:GANHandler, epochs=10, iterations=1024, batch_size=128, reporting=50):
+    def train(self, epochs=10, iterations=1024, batch_size=128, reporting=50):
 
         for epoch in range(epochs):
             print("Epoch {}/{}".format(epoch+1, epochs))
             for i in tqdm(range(iterations)):
-                inp, actual_pairs, zeros, ones, noise, full_ones = data.step(batch_size)
+                inp, actual_pairs, zeros, ones, noise, full_ones = self.handler.step(batch_size)
                 generated_results = self.gen.predict(inp)
                 generated_pairs = []
                 for indx, e in enumerate(generated_results):
@@ -144,8 +152,11 @@ class PolitiGen(object):
                 d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
                 g_loss = self.comb.train_on_batch(noise, full_ones)
 
-                generated_pairs_translated = data.translate(generated_pairs[0])
+                generated_pairs_translated = self.handler.translate(generated_pairs[0])
+
                 if i%reporting == 0:
+                    if not generated_pairs_translated[1]:
+                        breakpoint()
                     print("i={}, Disc loss (r): {}, Disc loss (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated)))
                     # breakpoint()
                 

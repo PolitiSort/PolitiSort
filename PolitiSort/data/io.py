@@ -22,10 +22,9 @@ class Tokenizer(object):
         arrayOfNums = []
         for word in arrayOfStrings:
             word = word.strip().strip(".").strip("!").strip("?").strip("/")
-            if len(word)>=5:
-                if "https" in word:
-                    arrayOfNums.append(0)
-                    pass
+            if "https" in word:
+                arrayOfNums.append(0)
+                continue
             token = self.__vocab.get(word.lower())
             if not token:
                 self.__vocab[word.lower()] = self.__counter
