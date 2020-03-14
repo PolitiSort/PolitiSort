@@ -92,10 +92,16 @@ class PolitiGen(object):
         noise_shape = (1,)
 
         model = Sequential()
-
-        model.add(Dense(64, activation="tanh", input_shape=noise_shape))
+        model.add(Dense(32,activation="tanh", input_shape=noise_shape))
+        model.add(Dense(64, activation="tanh"))
         model.add(Dense(128, activation="tanh"))
-        # model.add(Dense(128, activation="tanh"))
+        model.add(Dense(128, activation="tanh"))
+        model.add(Dense(128, activation="tanh"))
+        model.add(Dense(64, activation="tanh"))
+        model.add(Dense(32, activation="tanh"))
+        model.add(Dense(64, activation="tanh"))
+        model.add(Dense(128, activation="tanh"))
+        model.add(Dense(128, activation="tanh"))
         model.add(Dense(64, activation="tanh"))
         model.add(Dense(32, activation="tanh"))
         model.add(Dense(1))
@@ -109,7 +115,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(3e-3)
+        optimizer = Adam(0.001)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -137,7 +143,7 @@ class PolitiGen(object):
         # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
 
-    def train(self, epochs=10, iterations=1024, batch_size=128, reporting=50):
+    def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
 
         for epoch in range(epochs):
             print("Epoch {}/{}".format(epoch+1, epochs))
