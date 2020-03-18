@@ -3,11 +3,12 @@ from PolitiSort.network import PolitiNet, PolitiGen
 import pickle
 
 
-# tokenizer = Tokenizer()
-# handler = GANHandler("./senators_twsc_long.csv", tokenizer)
-# handler.compile()
-# with open("DH.GANHandler", "wb") as df:
-    # pickle.dump(handler, df)
+tokenizer = Tokenizer()
+handler = GANHandler("./senators_twsc_long.csv", tokenizer)
+handler.compile()
+with open("DH.GANHandler", "wb") as df:
+    pickle.dump(handler, df)
+breakpoint()
 with open("DH.GANHandler", "rb") as df:
     handler = pickle.load(df)
 # breakpoint()

@@ -22,7 +22,7 @@ class Tokenizer(object):
         arrayOfNums = []
         for word in arrayOfStrings:
             word = word.strip().strip(".").strip("!").strip("?").strip("/")
-            if "https" in word:
+            if "https" in word or "…" in word:
                 arrayOfNums.append(0)
                 continue
             token = self.__vocab.get(word.lower())
