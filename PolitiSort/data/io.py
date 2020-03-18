@@ -21,7 +21,7 @@ class Tokenizer(object):
         arrayOfStrings = string.split() if not by_char else list(string)
         arrayOfNums = []
         for word in arrayOfStrings:
-            word = word.strip().strip(".").strip("!").strip("?").strip("/")
+            word = word.strip().strip(".").strip("!").strip("?").strip("/").strip("-")
             if "https" in word or "…" in word:
                 arrayOfNums.append(0)
                 continue
