@@ -71,7 +71,6 @@ class PolitiGen(object):
         model.add(Conv1D(32, 16, activation="relu"))
         model.add(Flatten())
         model.add(Dropout(0.2))
-        model.add(Dense(128, activation="relu"))
         model.add(Dense(32, activation="relu"))
         model.add(Dense(1, activation='sigmoid'))
         return model
@@ -103,7 +102,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(5e-4)
+        optimizer = Adam(5e-5)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -131,6 +130,11 @@ class PolitiGen(object):
         # print(generator.summary(), discriminator.summary(), combined.summary())
         return generator, discriminator, combined
 
+    def __unison_shuffled_copies(self, a, b):
+        assert len(a) == len(b)
+        p = np.random.permutation(len(a))
+        return a[p], b[p]
+
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
 
         for epoch in range(epochs):
@@ -142,8 +146,11 @@ class PolitiGen(object):
                 for indx, e in enumerate(generated_results):
                     generated_pairs.append(np.hstack([inp[indx], e]))
                 generated_pairs = np.array(generated_pairs)
-                d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
-                d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
+                desc_in, desc_out = self.__unison_shuffled_copies(np.vstack([actual_pairs, generated_pairs]), np.hstack([ones, zeros]))
+                d_loss = self.desc.train_on_batch(desc_in, desc_out)
+                # d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
+                d_res_real = self.desc.predict(actual_pairs)
+                d_res_fake = self.desc.predict(generated_pairs)
                 g_loss = self.comb.train_on_batch(noise, full_ones)
 
                 generated_pairs_translated = self.handler.translate(generated_pairs[0])
@@ -151,7 +158,7 @@ class PolitiGen(object):
                 if i%reporting == 0:
                     if not generated_pairs_translated[1]:
                         breakpoint()
-                    print("i={}, Disc loss (r): {}, Disc loss (f): {}, Gen loss: {}, Words: {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated)))
+                    print("i={}, Disc loss: {}, Gen loss: {}, Words: {}, Disc Out: {}, Disc Out (Sample Real): {}".format(i, d_loss[0], g_loss, str(generated_pairs_translated), d_res_fake[0][0], d_res_real[0][0]))
                     # breakpoint()
                 
 
