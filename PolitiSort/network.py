@@ -65,22 +65,16 @@ class PolitiGen(object):
         """
         model = Sequential()
         #model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32, input_shape=(200,), activation="tanh"))
-
-        model.add(Dense(64, activation="tanh"))
-
-        model.add(Dense(128, activation="tanh"))
-
-        model.add(Dense(256, activation="tanh"))
-        model.add(Dense(256, activation="tanh"))
-
-        model.add(Dropout(0.25))
+        model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
+        model.add(Conv1D(128, 4, input_shape=(200,), activation="relu"))
+        model.add(Conv1D(64, 8, activation="relu"))
+        model.add(Conv1D(32, 16, activation="relu"))
+        model.add(Flatten())
+        model.add(Dropout(0.2))
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(32, activation="relu"))
         model.add(Dense(1, activation='sigmoid'))
         return model
-
-    def __generator_activation(self, x):
-        base = 10**(math.ceil(math.log(self.handler.tokenizer._counter, 10)))
-        return (math.e**(x))/((1/(self.handler.tokenizer._counter/base))*math.e**(x)+1)
 
     def __build_generator(self):
         """
@@ -92,15 +86,14 @@ class PolitiGen(object):
         noise_shape = (100,)
 
         model = Sequential()
-        model.add(Dense(32,activation="tanh", input_shape=noise_shape))
-        model.add(Dense(64, activation="tanh"))
-        model.add(Dense(128, activation="tanh"))
+        model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
+        model.add(Conv1D(128, 4, input_shape=noise_shape, activation="relu"))
+        model.add(Conv1D(64, 8, activation="relu"))
+        model.add(Conv1D(32, 16, activation="relu"))
+        model.add(Flatten())
         model.add(Dropout(0.2))
-        model.add(Dense(128, activation="tanh"))
-        model.add(Dense(64, activation="tanh"))
-        model.add(Dense(32, activation="tanh"))
-        model.add(Dense(100, activation="tanh"))
-        model.add(Activation(self.__generator_activation))
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(100, activation="relu"))
         return model
 
     def __compile(self):
@@ -110,7 +103,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(0.001)
+        optimizer = Adam(5e-4)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()

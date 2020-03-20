@@ -30,7 +30,7 @@ class Tokenizer(object):
             try:
                 token = self.__embedding[word.lower()]
             except KeyError:
-                token = np.zeros(100)
+                continue
             arrayOfNums.append(token)
         return np.array(arrayOfNums)
 

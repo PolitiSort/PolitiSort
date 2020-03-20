@@ -12,6 +12,6 @@ handler.compile()
 # with open("DH.GANHandler", "rb") as df:
 # r   handler = pickle.load(df)
 net = PolitiGen(handler)
-net.train(iterations=10248, batch_size=128, reporting=256)
+net.train(iterations=10248, batch_size=16, reporting=16)
 
 
