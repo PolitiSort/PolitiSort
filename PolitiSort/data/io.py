@@ -1,21 +1,24 @@
 import csv
 import numpy as np
 from tqdm import tqdm
+from gensim.models import word2vec
 from keras.preprocessing.sequence import pad_sequences
 from collections import defaultdict
 
 class Tokenizer(object):
-    def __init__(self):
+    def __init__(self, embedding_vector_file=""):
         self.__vocab = {0:"{{URL}}"}
         self.__vocab_rev = {"{{URL}}":0}
         self.__counter = 1
+        self.__embedding = word2vec.Word2Vec.load(embedding_vector_file)
 
     @property
     def _counter(self):
         return self.__counter
 
-    def _get_word(self, index:int):
-        return self.__vocab_rev.get(int(index))
+    def get_word(self, vector:np.ndarray):
+        word = self.__embedding.similar_by_vector(vector)[0][0]
+        return word
 
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
@@ -23,23 +26,18 @@ class Tokenizer(object):
         for word in arrayOfStrings:
             word = word.strip().strip(".").strip("!").strip("?").strip("/").strip("-")
             if "https" in word or "…" in word:
-                arrayOfNums.append(0)
                 continue
-            token = self.__vocab.get(word.lower())
-            if not token:
-                self.__vocab[word.lower()] = self.__counter
-                self.__vocab_rev[self.__counter] = word.lower()
-                token = self.__counter
-                self.__counter += 1
-                arrayOfNums.append(token)
-            else:
-                arrayOfNums.append(token)
-        return arrayOfNums
+            try:
+                token = self.__embedding[word.lower()]
+            except KeyError:
+                token = np.zeros(100)
+            arrayOfNums.append(token)
+        return np.array(arrayOfNums)
 
     def getString(self, nums):
         arrayOfStrings = []
         for number in nums:
-                string = self.__vocab_rev[number]
+                string = self.get_word(number)
                 arrayOfStrings.append(string)
         return arrayOfStrings
 
@@ -53,23 +51,23 @@ class GANHandler(object):
 
     @staticmethod
     def noise(batch:int):
-        return np.random.randint(0, 20000, (batch,))
+        return np.random.uniform(-1,1, (batch,100))
 
     def translate(self, gen_pairs:list):
-        return [self.tokenizer._get_word(e*1e5) for e in gen_pairs]
+        gen_pairs = np.split(gen_pairs, 2)
+        return [self.tokenizer.get_word(e) for e in gen_pairs]
 
-    def step(self, batch_size, prev=None):
+    def step(self, batch_size):
         assert self.__isCompiled, "Uncompiled Handler! Call GANHandler().compile()"
         halfbatch = int(batch_size/2)
         assert halfbatch == batch_size/2, "Batch size must be divisible by 2!!"
-        if not prev:
-            prev = self.noise(halfbatch)
+        prev = self.noise(halfbatch)
         new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"])-1, halfbatch)
         new = self.__encodedData["bigrams"][new_indxs]
         zeros = np.zeros(halfbatch)
         ones = np.ones(halfbatch)
         full_ones = np.ones(batch_size)
-        return prev*1e-5, new*1e-5, zeros, ones, self.noise(batch_size)*1e-5, full_ones
+        return prev, new, zeros, ones, self.noise(batch_size), full_ones
         
     def compile(self, retreiveFields=["status"]):
         with open(self.__csvInput, 'r') as df:
@@ -84,9 +82,9 @@ class GANHandler(object):
                         self.__encodedData[field].append(self.tokenizer.tokenize(row[field], by_char=True))
         for indx, i in tqdm(enumerate(self.__encodedData["status"]), total=len(self.__encodedData["status"])):
             for e in range(len(i)-2):
-                check = [self.__encodedData["status"][indx][e], self.__encodedData["status"][indx][e+1]]
-                if check not in self.__encodedData["bigrams"]:
-                    self.__encodedData["bigrams"].append(check)
+                check = np.hstack([self.__encodedData["status"][indx][e], self.__encodedData["status"][indx][e+1]])
+                self.__encodedData["bigrams"].append(check)
+            
         self.__encodedData["bigrams"] = np.array(self.__encodedData["bigrams"])
         # self.__encodedData["status"] = pad_sequences(self.__encodedData["status"], maxlen)
         # self.__encodedData["description"] = pad_sequences(self.__encodedData["description"], maxlen)

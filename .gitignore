@@ -139,6 +139,13 @@ twitter_get_secret.py
 Politisort/.DS_Store
 .idea/workspace.xml
 
-
 # Vim Swaps
 *.swp
+
+# Floo Remove
+*.floo
+*.flooignore
+
+# Yuge File
+1billion_word_vectors.syn1neg.npy
+1billion_word_vectors.wv.syn0.npy

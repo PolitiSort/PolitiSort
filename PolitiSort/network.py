@@ -65,7 +65,7 @@ class PolitiGen(object):
         """
         model = Sequential()
         #model.add(Conv1D(32, kernel_size=3, strides=2, input_shape=(1,), padding="same"))
-        model.add(Dense(32, input_shape=(2,), activation="tanh"))
+        model.add(Dense(32, input_shape=(200,), activation="tanh"))
 
         model.add(Dense(64, activation="tanh"))
 
@@ -89,22 +89,17 @@ class PolitiGen(object):
 
         returns: the model object
         """
-        noise_shape = (1,)
+        noise_shape = (100,)
 
         model = Sequential()
         model.add(Dense(32,activation="tanh", input_shape=noise_shape))
         model.add(Dense(64, activation="tanh"))
         model.add(Dense(128, activation="tanh"))
-        model.add(Dense(128, activation="tanh"))
-        model.add(Dense(128, activation="tanh"))
-        model.add(Dense(64, activation="tanh"))
-        model.add(Dense(32, activation="tanh"))
-        model.add(Dense(64, activation="tanh"))
-        model.add(Dense(128, activation="tanh"))
+        model.add(Dropout(0.2))
         model.add(Dense(128, activation="tanh"))
         model.add(Dense(64, activation="tanh"))
         model.add(Dense(32, activation="tanh"))
-        model.add(Dense(1))
+        model.add(Dense(100, activation="tanh"))
         model.add(Activation(self.__generator_activation))
         return model
 
@@ -127,7 +122,7 @@ class PolitiGen(object):
         generator = self.__build_generator()
 
         # The generator takes noise as input and generates words
-        noise = Input(shape=(1,))
+        noise = Input(shape=(100,))
         word = generator(noise)
 
         # For the combined model we will only train the generator
@@ -152,7 +147,7 @@ class PolitiGen(object):
                 generated_results = self.gen.predict(inp)
                 generated_pairs = []
                 for indx, e in enumerate(generated_results):
-                    generated_pairs.append([inp[indx], e[0]])
+                    generated_pairs.append(np.hstack([inp[indx], e]))
                 generated_pairs = np.array(generated_pairs)
                 d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
                 d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
