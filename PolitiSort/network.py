@@ -4,7 +4,7 @@ import numpy as np
 from keras.models import Model
 from keras.optimizers import Adam
 from contextlib import redirect_stdout
-from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape, concatenate
+from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape, concatenate, LeakyReLU 
 # Dependencies used in the version of Politisort that takes Bios into account
 # from keras.layers import concatenate, LeakyReLU
 from keras.layers import UpSampling2D, Conv2D, LeakyReLU, Activation
@@ -65,10 +65,16 @@ class PolitiGen(object):
         returns: the model object
         """
         model = Sequential()
-        model.add(Dense(64, activation="relu"))
-        model.add(Dense(32, activation="relu"))
-        model.add(Dense(64, activation="relu"))
-        model.add(Dense(32, activation="relu"))
+        model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
+        model.add(Conv1D(64, 3, activation=LeakyReLU()))
+        model.add(Conv1D(32, 5, activation=LeakyReLU()))
+        model.add(Dropout(0.2))
+        model.add(Conv1D(64, 3, activation=LeakyReLU()))
+        model.add(Conv1D(32, 5, activation=LeakyReLU()))
+        model.add(Flatten())
+        model.add(Dense(64, activation=LeakyReLU()))
+        model.add(Dense(16, activation=LeakyReLU()))
+        model.add(Dense(8, activation=LeakyReLU()))
         model.add(Dense(1, activation='sigmoid'))
         return model
 
@@ -83,16 +89,14 @@ class PolitiGen(object):
 
         model = Sequential()
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
-        model.add(Conv1D(64, 8, activation="relu"))
-        model.add(Conv1D(32, 16, activation="relu"))
+        model.add(Conv1D(128, 3))
+        model.add(Conv1D(64, 5))
+        model.add(UpSampling1D(size=4))
+        model.add(Conv1D(64, 7))
+        model.add(Conv1D(32, 9))
         model.add(UpSampling1D())
-        model.add(Dropout(0.25))
-        model.add(Conv1D(64, 8, activation="relu"))
-        model.add(Conv1D(32, 16, activation="relu"))
-        model.add(UpSampling1D())
-        model.add(Dropout(0.25))
         model.add(Flatten())
-        model.add(Dense(100, activation="relu"))
+        model.add(Dense(100))
         return model
 
     def __compile(self):
@@ -102,7 +106,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(6e-4)
+        optimizer = Adam(1e-4)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -159,8 +163,6 @@ class PolitiGen(object):
                 generated_pairs_translated = self.handler.translate(generated_pairs[0])
 
                 if i%reporting == 0:
-                    if not generated_pairs_translated[1]:
-                        breakpoint()
                     print("i={}, Disc loss (R): {}, Disc loss (F): {}, Gen loss: {}, Words: {}, Disc Out (Sample Fake): {}, Disc Out (Sample Real): {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated), d_res_fake[0][0], d_res_real[0][0]))
                     # breakpoint()
                 
