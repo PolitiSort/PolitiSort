@@ -146,6 +146,3 @@ Politisort/.DS_Store
 *.floo
 *.flooignore
 
-# Yuge File
-1billion_word_vectors.syn1neg.npy
-1billion_word_vectors.wv.syn0.npy
