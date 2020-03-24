@@ -49,9 +49,10 @@ class GANHandler(object):
         self.__encodedData = defaultdict(list)
         self.__isCompiled = False
 
-    @staticmethod
-    def noise(batch:int):
-        return np.random.uniform(-1,1, (batch,100))
+    def noise(self, batch:int):
+        samples_flattened = self.__encodedData["status"].reshape((-1, 100))
+        indexes = np.random.randint(0,samples_flattened.shape[0],(batch,))
+        return samples_flattened[indexes]
 
     def translate(self, gen_pairs:list):
         gen_pairs = np.split(gen_pairs, 2)
@@ -86,6 +87,7 @@ class GANHandler(object):
                 self.__encodedData["bigrams"].append(check)
             
         self.__encodedData["bigrams"] = np.array(self.__encodedData["bigrams"])
+        self.__encodedData["status"] = np.array(self.__encodedData["status"])
         # self.__encodedData["status"] = pad_sequences(self.__encodedData["status"], maxlen)
         # self.__encodedData["description"] = pad_sequences(self.__encodedData["description"], maxlen)
 
