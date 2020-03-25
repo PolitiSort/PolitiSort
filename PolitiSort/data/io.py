@@ -17,7 +17,7 @@ class Tokenizer(object):
         return self.__counter
 
     def get_word(self, vector:np.ndarray):
-        word = self.__embedding.similar_by_vector(vector)[0][0]
+        word = self.__embedding.similar_by_vector((vector*10)-10)[0][0]
         return word
 
     def tokenize(self, string, by_char=False):
@@ -28,7 +28,7 @@ class Tokenizer(object):
             if "https" in word or "…" in word:
                 continue
             try:
-                token = self.__embedding[word.lower()]
+                token = ((self.__embedding[word.lower()])+10)/10
             except KeyError:
                 continue
             arrayOfNums.append(token)

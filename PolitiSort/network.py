@@ -66,11 +66,8 @@ class PolitiGen(object):
         """
         model = Sequential()
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
-        model.add(Conv1D(64, 3, activation=LeakyReLU()))
-        model.add(Conv1D(32, 5, activation=LeakyReLU()))
-        model.add(Dropout(0.2))
-        model.add(Conv1D(64, 3, activation=LeakyReLU()))
-        model.add(Conv1D(32, 5, activation=LeakyReLU()))
+        model.add(Conv1D(64, 5, activation=LeakyReLU()))
+        model.add(Conv1D(128, 3, activation=LeakyReLU()))
         model.add(Flatten())
         model.add(Dense(64, activation=LeakyReLU()))
         model.add(Dense(16, activation=LeakyReLU()))
@@ -96,6 +93,8 @@ class PolitiGen(object):
         model.add(Conv1D(32, 9))
         model.add(UpSampling1D())
         model.add(Flatten())
+        model.add(Dense(568))
+        model.add(Dense(256))
         model.add(Dense(100))
         return model
 
@@ -106,7 +105,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(1e-4)
+        optimizer = Adam(5e-5)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -156,8 +155,8 @@ class PolitiGen(object):
                 desc_in, desc_out = self.__unison_shuffled_copies(np.vstack([actual_pairs, generated_pairs]), np.hstack([ones, zeros]))
                 d_res_real = self.desc.predict(actual_pairs)
                 d_res_fake = self.desc.predict(generated_pairs)
-                d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
                 d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
+                d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
                 g_loss = self.comb.train_on_batch(noise, full_ones)
 
                 generated_pairs_translated = self.handler.translate(generated_pairs[0])
