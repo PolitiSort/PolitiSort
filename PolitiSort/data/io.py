@@ -1,4 +1,5 @@
 import csv
+import random
 import numpy as np
 from tqdm import tqdm
 from gensim.models import word2vec
@@ -54,6 +55,17 @@ class GANHandler(object):
         indexes = np.random.randint(0,samples.shape[0],(batch,))
         return samples[indexes]
 
+    @staticmethod
+    def __noisy_labels(batch_size, wrong_prob=0.1, correct=0, incorrect=1):
+        res = []
+        for _ in range(batch_size):
+            seed = random.uniform(0,1)
+            if wrong_prob >= seed:
+                res.append(incorrect)
+            else:
+                res.append(correct)
+        return np.array(res)
+
     def translate(self, gen_pairs:list):
         gen_pairs = np.split(gen_pairs, 2)
         return [self.tokenizer.get_word(e) for e in gen_pairs]
@@ -65,8 +77,8 @@ class GANHandler(object):
         prev = self.noise(halfbatch)
         new_indxs = np.random.randint(1, len(self.__encodedData["bigrams"])-1, halfbatch)
         new = self.__encodedData["bigrams"][new_indxs]
-        zeros = np.zeros(halfbatch)
-        ones = np.ones(halfbatch)
+        zeros = self.__noisy_labels(halfbatch)
+        ones = self.__noisy_labels(halfbatch, correct=1, incorrect=0)
         full_ones = np.ones(batch_size)
         return prev, new, zeros, ones, self.noise(batch_size), full_ones
         

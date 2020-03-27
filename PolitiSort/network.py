@@ -105,7 +105,7 @@ class PolitiGen(object):
         returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(5e-5)
+        optimizer = Adam(5e-4)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
