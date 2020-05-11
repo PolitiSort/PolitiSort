@@ -83,7 +83,7 @@ class PolitiGen(object):
         returns: the model object
         """
         noise_shape = (100,)
-
+	
         model = Sequential()
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
         model.add(Conv1D(128, 3))
@@ -130,7 +130,8 @@ class PolitiGen(object):
         # noise as input => generates words => determines validity
         combined = Model(inputs=noise, outputs=validity)
         combined.compile(loss='binary_crossentropy', optimizer=optimizer)
-        # print(generator.summary(), discriminator.summary(), combined.summary())
+
+	# Open the model summary file
         with open("model.summary", "w") as df:
             with redirect_stdout(df):
                 combined.summary()
@@ -163,7 +164,6 @@ class PolitiGen(object):
 
                 if i%reporting == 0:
                     print("i={}, Disc loss (R): {}, Disc loss (F): {}, Gen loss: {}, Words: {}, Disc Out (Sample Fake): {}, Disc Out (Sample Real): {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated), d_res_fake[0][0], d_res_real[0][0]))
-                    # breakpoint()
                 
 
 if __name__ == "__main__":
