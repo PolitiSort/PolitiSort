@@ -33,3 +33,5 @@ This should automatically begin training the GAN model in this project. If you e
 This repository has two different projects: Politisort and Politigen. At the moment, the run.py file will compile and train the Politigen model in the master branch. If you wish to train and run the Politisort model, checkout to the Politisort branch. In the future, these branches are likely to be merged and run.py will likely have system arguments. Running run.py in any branch using the following command will train the model:
 
 ```python3 run.py```
+
+To store the trained model, refer to the Keras documentation.
