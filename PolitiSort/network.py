@@ -22,7 +22,12 @@ class PolitiGen(object):
     Creates a GAN model to generate political tweets.
     Has methods to train the GAN.
     """
+
     def __init__(self, handler: GANHandler):
+        """
+        Creates a PolitiGen network
+        :param handler: a compiled GANHandler. See PolitiSort.io.data
+        """
         self.handler = handler
         self.gen, self.desc, self.comb = self.__compile()
 
@@ -146,24 +151,40 @@ class PolitiGen(object):
         :param reporting: reports every 50 iterations by default.
         :return:
         """
+
+        # For each epoch...
         for epoch in range(epochs):
+            # Report the epoch head
             print("Epoch {}/{}".format(epoch+1, epochs))
+
+            # Iterate though num_iter for sampling
             for i in tqdm(range(iterations)):
+                # Sample a batch from the compiled DataHandler (see Politisort.data.io)
                 inp, actual_pairs, zeros, ones, noise, full_ones = self.handler.step(batch_size)
+                # Predict an output
                 generated_results = self.gen.predict(inp)
+                # Sew the data into pairs with the inputs given
                 generated_pairs = []
                 for indx, e in enumerate(generated_results):
-                    generated_pairs.append(np.hstack([inp[indx], e]))
+                    generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
+                # Turn the aforemention generated_pairs to an numpy array
                 generated_pairs = np.array(generated_pairs)
+                # Shuffle input/outputs in unison
                 desc_in, desc_out = self.__unison_shuffled_copies(np.vstack([actual_pairs, generated_pairs]), np.hstack([ones, zeros]))
+                # Use discriminators to predict actual, generated pairs' identities for logging/validation
                 d_res_real = self.desc.predict(actual_pairs)
                 d_res_fake = self.desc.predict(generated_pairs)
+
+                # Train the discriminator
                 d_loss_fake = self.desc.train_on_batch(generated_pairs, zeros)
                 d_loss_real = self.desc.train_on_batch(actual_pairs, ones)
+                # Backprop the newly trained gradients using "fake ones"
                 g_loss = self.comb.train_on_batch(noise, full_ones)
 
+                # Translate the predicted vectors to human words for logging
                 generated_pairs_translated = self.handler.translate(generated_pairs[0])
 
+                # Log if need be
                 if i%reporting == 0:
                     print("i={}, Disc loss (R): {}, Disc loss (F): {}, Gen loss: {}, Words: {}, Disc Out (Sample Fake): {}, Disc Out (Sample Real): {}".format(i, d_loss_real[0], d_loss_fake[0], g_loss, str(generated_pairs_translated), d_res_fake[0][0], d_res_real[0][0]))
                 
