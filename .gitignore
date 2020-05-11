@@ -134,9 +134,15 @@ dmypy.json
 twitter_get_secret.py
 
 # Ignore Misc IDE Files
-.idea/
+.idea
 .DS_Store
 Politisort/.DS_Store
+.idea/workspace.xml
 
 # Vim Swaps
 *.swp
+
+# Floo Remove
+*.floo
+*.flooignore
+
