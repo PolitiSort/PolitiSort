@@ -1,5 +1,5 @@
 from PolitiSort.data.io import Tokenizer, DataHandler, GANHandler
-from PolitiSort.network import PolitiNet, PolitiGen
+from PolitiSort.network import PolitiGen
 import pickle
 
 
