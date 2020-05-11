@@ -3,7 +3,7 @@ from PolitiSort.network import PolitiNet, PolitiGen
 import pickle
 
 
-tokenizer = Tokenizer("./1billion_word_vectors")
+tokenizer = Tokenizer("./static/1billion_word_vectors")
 handler = GANHandler("./senators_twsc_long.csv", tokenizer)
 handler.compile()
 #with open("DH.GANHandler", "wb") as df:
