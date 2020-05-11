@@ -54,7 +54,11 @@ class PolitiNet(object):
         self.model.fit(x=[pad_sequences(input_data["status"], maxlen=self.__maxStatus)], y=[input_data["isDem"]], epochs=epochs, batch_size=batch_size, validation_split=val_split, shuffle=True)
 
 class PolitiGen(object):
-    def __init__(self, handler:GANHandler):
+    """
+    Creates a GAN model to generate political tweets.
+    Has methods to train the GAN.
+    """
+    def __init__(self, handler: GANHandler):
         self.handler = handler
         self.gen, self.desc, self.comb = self.__compile()
 
@@ -62,7 +66,7 @@ class PolitiGen(object):
         """
         Put together a CNN that will return a single confidence output.
 
-        returns: the model object
+        :returns: the model object
         """
         model = Sequential()
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1)))
@@ -80,7 +84,7 @@ class PolitiGen(object):
         Put together a model that takes in one-dimensional noise and outputs one-dimensional
         data representing words with each number representing an index in our corpus.
 
-        returns: the model object
+        :returns: the model object
         """
         noise_shape = (100,)
 	
@@ -102,7 +106,7 @@ class PolitiGen(object):
         """
         Puts together a model that combines the discriminator and generator models.
 
-        returns: the generator, discriminator, and combined model objects
+        :returns: the generator, discriminator, and combined model objects
         """
 
         optimizer = Adam(5e-4)
@@ -131,7 +135,7 @@ class PolitiGen(object):
         combined = Model(inputs=noise, outputs=validity)
         combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-	# Open the model summary file
+        # Open the model summary file
         with open("model.summary", "w") as df:
             with redirect_stdout(df):
                 combined.summary()
@@ -143,7 +147,15 @@ class PolitiGen(object):
         return a[p], b[p]
 
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
+        """
+        Method trains the GAN.
 
+        :param epochs: trains the GAN for a default of 100 epochs.
+        :param iterations: trains the GAN with a default amount of 1024 iterations.
+        :param batch_size: trains the GAN with a batch size of 128 by default.
+        :param reporting: reports every 50 iterations by default.
+        :return:
+        """
         for epoch in range(epochs):
             print("Epoch {}/{}".format(epoch+1, epochs))
             for i in tqdm(range(iterations)):
