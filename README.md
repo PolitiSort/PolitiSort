@@ -12,7 +12,7 @@ Politisort is a project containing two seperate efforts. The Politisort part of 
 The first step is to clone the repository using  the following command:
 
 ```
-git clone <insert url because i'm too lazy right now>
+git clone https://github.com/PolitiSort/PolitiSort.git
  ```
 
 Next, change directorys into the repository using:
