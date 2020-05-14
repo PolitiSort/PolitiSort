@@ -1,7 +1,7 @@
 from PolitiSort.data.io import Tokenizer, DataHandler, GANHandler
 from PolitiSort.network import PolitiGen
 import pickle
-
+import sys
 
 tokenizer = Tokenizer("./static/1billion_word_vectors")
 handler = GANHandler("./senators_twsc_long.csv", tokenizer)
@@ -11,7 +11,7 @@ handler.compile()
 # breakpoint()
 # with open("DH.GANHandler", "rb") as df:
 # r   handler = pickle.load(df)
-net = PolitiGen(handler)
-net.train(iterations=10248, batch_size=128, reporting=8)
+# net = PolitiGen(handler)
+# net.train(iterations=10248, batch_size=128, reporting=8)
 
 
