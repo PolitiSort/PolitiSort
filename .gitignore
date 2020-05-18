@@ -147,4 +147,5 @@ Politisort/.DS_Store
 # Floo Remove
 *.floo
 *.flooignore
+*.GANHandler
 

@@ -141,6 +141,23 @@ class PolitiGen(object):
         # Re-Index inputs to that random list order
         return a[p], b[p]
 
+    def save(self, directory):
+        self.comb.save(directory)
+
+    def synthesize(self, length=None):
+        if not length:
+            length = random.randint(5, 54)
+
+        inp, _, _, _, _, _ = self.handler.step(2)
+        sent = ""
+        for _ in range(length):
+            generated_results = self.gen.predict(inp)
+            generated_pairs = []
+            for indx, e in enumerate(generated_results):
+                generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
+            generated_pairs_translated = self.handler.translate(generated_pairs[0])
+            print(generated_pairs_translated)
+
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
         """
         Method trains the GAN.

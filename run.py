@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser("PolitiGen")
 parser.add_argument("command", help="[scrape] dataset/[compile] corpus/[train] model", type=str)
 parser.add_argument("-i", "--input", help="Input file path. Either the Corpus, Compiled Data, or Raw Acounts", type=str)
 parser.add_argument("-o", "--output", help="Output file path. Either the Corpus, Compiled Data, or Network HDH5", type=str)
+parser.add_argument("--trainargs", help="String shaped \"epochs iterations batch_size reporting_count\"", type=str)
 parser.add_argument("--key", help="A JSON String acquired from Twitter shaped {'CONSUMER_KEY': '', 'CONSUMER_SECRET': '', 'ACCESS_KEY': '', 'ACCESS_SECRET': ''}", type=str)
 args = parser.parse_args()
 
@@ -24,6 +25,25 @@ elif command == "compile":
     handler.compile()
     with open(args.output, "wb") as df:
         pickle.dump(handler, df)
-# net = PolitiGen(handler)
-# net.train(iterations=10248, batch_size=128, reporting=8)
+elif command == "train":
+    with open(args.input, "rb") as df:
+        handler = pickle.load(df)
+    net = PolitiGen(handler)
+    if args.trainargs:
+        ta = args.trainargs.split(" ")
+        try:
+            epochs = int(ta[0])
+            iterations = int(ta[1])
+            batch_size = int(ta[2])
+            reporting_count = int(ta[3])
+        except IndexError:
+            raise ValueError("Malformed trainargs. Please shape it \"iterations batch_size reporting_count\".")
+    else:
+        epochs = int(input("Epochs: "))
+        iterations = int(input("Iterations: "))
+        batch_size = int(input("Batch Size: "))
+        reporting_count = int(input("Reporting/Iter: "))
+    breakpoint()
+    net.train(epochs=epochs, iterations=iterations, batch_size=batch_size, reporting=reporting_count)
+    print(net.comb)
 
