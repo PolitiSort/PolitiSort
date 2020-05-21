@@ -149,14 +149,29 @@ class PolitiGen(object):
             length = random.randint(5, 54)
 
         inp, _, _, _, _, _ = self.handler.step(2)
-        sent = ""
-        for _ in range(length):
-            generated_results = self.gen.predict(inp)
+        generated_results = self.gen.predict(inp)
+        generated_pairs = []
+        for indx, e in enumerate(generated_results):
+            generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
+        generated_pairs_translated = self.handler.translate(generated_pairs[0])
+        sent = generated_pairs_translated[0] + " " + generated_pairs_translated[1]
+        inp = generated_results
+        for _ in range(length-1):
+            print(inp)
+            generated_results = self.gen.predict(np.array(inp))
+            print(sent)
+            inp = generated_results
+            print(sent)
             generated_pairs = []
+            print(sent)
             for indx, e in enumerate(generated_results):
+                print(sent)
                 generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
+            print(sent)
             generated_pairs_translated = self.handler.translate(generated_pairs[0])
-            print(generated_pairs_translated)
+            print(sent)
+            sent = sent + " " + generated_pairs_translated[1]
+        print(sent)
 
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
         """
