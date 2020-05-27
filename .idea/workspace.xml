@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0e1fec14-343b-4c57-89aa-8bde1f4bb6da" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/PolitiSort/apimanager.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolitiSort/apimanager.py" afterDir="false" />
-    </list>
+    <list default="true" id="0e1fec14-343b-4c57-89aa-8bde1f4bb6da" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -268,11 +266,7 @@
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
     <editor active="true" />
     <layout>
-<<<<<<< HEAD
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2279587" />
-=======
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1683876" />
->>>>>>> 4ec3cb2... Added possibility for passing GANHandler object to training function
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -376,7 +370,7 @@
     <entry file="file://$PROJECT_DIR$/PolitiSort/data/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/run.py">
+    <entry file="file://$PROJECT_DIR$/PolitiSort/data/io.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="10" column="11" selection-start-line="10" selection-start-column="11" selection-end-line="10" selection-end-column="11" />

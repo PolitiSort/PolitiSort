@@ -1,6 +1,5 @@
 from . import network  # File that contains the network and all it's functions
 from .data import hydrate, io  # File that contains the hydrator
-
 import pickle  # Pickle library
 
 
@@ -11,10 +10,13 @@ def scrape(input, output, key):
     :param input: The snowflakes of the accounts that are to be scraped for their tweets.
     :param output: The destination file that this data is to be scraped to.
     :param key: Key used to scrape Twitter.
-    :return: Nothing
+    :return: True or False depending on if it works or not
     '''
-
-    hydrate.run(input, output, key)
+    try:
+        hydrate.run(input, output, key)
+        return True
+    except:
+        return False
 
 
 def trainModel(epochs, iterations, batch_size, reporting_count, handler, modelSaveFile = "do not save"):
