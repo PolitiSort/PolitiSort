@@ -1,15 +1,17 @@
 import warnings
+
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', FutureWarning)
     from PolitiSort.data.io import Tokenizer, DataHandler, GANHandler
     from PolitiSort.data import hydrate
     from PolitiSort.network import PolitiGen
+
 import pickle
 import sys
 import argparse
 
 parser = argparse.ArgumentParser("PolitiGen")
-parser.add_argument("command", help="[scrape] dataset/[compile] corpus/[train] model", type=str)
+parser.add_argument("command", help="[scrape] dataset/[compile] corpus/[train] model/[make] sentences", type=str)
 parser.add_argument("-i", "--input", help="Input file path. Either the Corpus, Compiled Data, or Raw Acounts", type=str)
 parser.add_argument("-o", "--output", help="Output file path. Either the Corpus, Compiled Data, or Network HDH5", type=str)
 parser.add_argument("--trainargs", help="String shaped \"epochs iterations batch_size reporting_count\"", type=str)
@@ -43,7 +45,7 @@ elif command == "train":
         iterations = int(input("Iterations: "))
         batch_size = int(input("Batch Size: "))
         reporting_count = int(input("Reporting/Iter: "))
-    breakpoint()
     net.train(epochs=epochs, iterations=iterations, batch_size=batch_size, reporting=reporting_count)
-    print(net.comb)
+    net.save(args.output)
+    
 

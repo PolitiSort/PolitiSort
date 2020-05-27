@@ -149,3 +149,6 @@ Politisort/.DS_Store
 *.flooignore
 *.GANHandler
 
+# PolitiSort Static
+./static/*
+
