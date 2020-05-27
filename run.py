@@ -7,6 +7,7 @@ with warnings.catch_warnings():
     from PolitiSort.network import PolitiGen
 
 import pickle
+# TODO ask jack why this is imported
 import sys
 import argparse
 
