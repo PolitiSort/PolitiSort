@@ -1,6 +1,7 @@
 from . import network  # File that contains the network and all it's functions
-from .data import hydrate  # File that contains the hydrator
-import pickle # Pickle library
+from .data import hydrate, io  # File that contains the hydrator
+
+import pickle  # Pickle library
 
 
 def scrape(input, output, key):
@@ -28,26 +29,37 @@ def trainModel(epochs, iterations, batch_size, reporting_count, handler, modelSa
     :param modelSaveFile: Saves the model to this file if passed
     :return: returns the trained model if 3
     '''
+    if type(handler) is io.GANHandler:
+        with open(handler, "rb") as df:
+            handle = pickle.load(df)
+    elif type(handler) is str:
+        handle = handler
+    else:
+        raise ValueError("trainModel was passed neither a type GANHandler, nor filepath to Handler")
 
-    with open(handler, "rb") as df:
-        GANhandler = pickle.load(df)
-    net = network.PolitiGen(GANhandler)
+    net = network.PolitiGen(handle)
     net.train(epochs, iterations, batch_size, reporting_count)
+
     if modelSaveFile != "do not save":
         net.save(modelSaveFile)
     return net
 
 
-def compile(inputFile, outputFile):
+def compile(inputFile, outputFile = "do not save"):
     '''
-    The compile function takes the passed CSV and creates a handler that will then be dumped into a passed pickle path
+    The compile function takes the passed CSV and creates a handler that will then be dumped into a passed pickle path, or returned
 
     :param inputFile: The path to the CSV file to be handled.
-    :param outputFile: The path of the pickle that the handler will be dumped into.
-    :return:
+    :param outputFile: The path of the pickle that the handler will be dumped into. If not provided it will not be pickled
+    :return: Handler
     '''
-
-    pass
+    tokenizer = io.Tokenizer("./static/1billion_word_vectors")
+    handler = io.GANHandler(inputFile, tokenizer)
+    handler.compile()
+    if outputFile != "do not save":
+        with open(outputFile, "wb") as df:
+            pickle.dump(handler, df)
+    return handler
 
 
 def generate(seed, input, sentence_count):
