@@ -2,7 +2,7 @@ import tensorflow as tf
 import math
 import random
 import numpy as np
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.optimizers import Adam
 from contextlib import redirect_stdout
 from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape, concatenate, LeakyReLU 
@@ -140,6 +140,12 @@ class PolitiGen(object):
         p = np.random.permutation(len(a))
         # Re-Index inputs to that random list order
         return a[p], b[p]
+
+    @classmethod
+    def load(cls, directory, handler):
+        net = cls(handler)
+        net.gen = load_model(directory)
+        return net
 
     def save(self, directory):
         self.comb.save(directory)

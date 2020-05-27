@@ -15,6 +15,8 @@ parser.add_argument("command", help="[scrape] dataset/[compile] corpus/[train] m
 parser.add_argument("-i", "--input", help="Input file path. Either the Corpus, Compiled Data, or Raw Acounts", type=str)
 parser.add_argument("-o", "--output", help="Output file path. Either the Corpus, Compiled Data, or Network HDH5", type=str)
 parser.add_argument("--trainargs", help="String shaped \"epochs iterations batch_size reporting_count\"", type=str)
+parser.add_argument("-s", "--seed", help="Seed model for synthesis.", type=str)
+parser.add_argument("--sentcount", help="The number of sentences to make.", type=int)
 parser.add_argument("--key", help="A JSON String acquired from Twitter shaped {'CONSUMER_KEY': '', 'CONSUMER_SECRET': '', 'ACCESS_KEY': '', 'ACCESS_SECRET': ''}", type=str)
 args = parser.parse_args()
 
@@ -47,5 +49,11 @@ elif command == "train":
         reporting_count = int(input("Reporting/Iter: "))
     net.train(epochs=epochs, iterations=iterations, batch_size=batch_size, reporting=reporting_count)
     net.save(args.output)
-    
+elif command == "make":
+    net = PolitiGen.load(args.seed, args.input)
+    sents = ""
+    for _ in range(args.sentcount):
+        sents = sents + net.synthesize() + " "
+    with open(args.output, "w") as df:
+        df.write(sents)
 
