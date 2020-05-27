@@ -141,11 +141,6 @@ class PolitiGen(object):
         # Re-Index inputs to that random list order
         return a[p], b[p]
 
-    @classmethod
-    def load(cls, directory, handler):
-        net = cls(handler)
-        net.gen = load_model(directory)
-        return net
 
     def save(self, directory):
         self.comb.save(directory)

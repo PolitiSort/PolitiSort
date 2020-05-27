@@ -3,23 +3,23 @@ from .data import hydrate, io  # File that contains the hydrator
 import pickle  # Pickle library
 
 
-def scrape(input, output, key):
+def scrape(users, output_file, key):
     '''
     Function scrape scrapes Twitter using the provided snowflakes into a provided file using a provided key
 
-    :param input: The snowflakes of the accounts that are to be scraped for their tweets.
-    :param output: The destination file that this data is to be scraped to.
+    :param users: The snowflakes of the accounts that are to be scraped for their tweets.
+    :param output_file: The destination file that this data is to be scraped to.
     :param key: Key used to scrape Twitter.
     :return: True or False depending on if it works or not
     '''
     try:
-        hydrate.run(input, output, key)
+        hydrate.run(users, output_file, key)
         return True
     except:
         return False
 
 
-def trainModel(epochs, iterations, batch_size, reporting_count, handler, modelSaveFile = "do not save"):
+def train_model(epochs, iterations, batch_size, reporting_count, handler, modelSaveFile = "do not save"):
     '''
     Function trainModel trains and saves a model using the passed parameters
 
@@ -47,22 +47,55 @@ def trainModel(epochs, iterations, batch_size, reporting_count, handler, modelSa
     return net
 
 
-def compile(inputFile, outputFile = "do not save"):
+def compile_handler(input_file, output_file="do not save"):
     '''
     The compile function takes the passed CSV and creates a handler that will then be dumped into a passed pickle path, or returned
 
-    :param inputFile: The path to the CSV file to be handled.
-    :param outputFile: The path of the pickle that the handler will be dumped into. If not provided it will not be pickled
+    :param input_file: The path to the CSV file to be handled.
+    :param output_file: The path of the pickle that the handler will be dumped into. If not provided it will not be pickled
     :return: Handler
     '''
     tokenizer = io.Tokenizer("./static/1billion_word_vectors")
-    handler = io.GANHandler(inputFile, tokenizer)
+    handler = io.GANHandler(input_file, tokenizer)
     handler.compile()
-    if outputFile != "do not save":
-        with open(outputFile, "wb") as df:
+    if output_file != "do not save":
+        with open(output_file, "wb") as df:
             pickle.dump(handler, df)
     return handler
 
 
-def generate(seed, input, sentence_count):
-    pass
+def generate_tweet(handler, model, sentence_count, output_file="none"):
+    '''
+    The generateTweet function creates tweets based upon how many sentences were desired
+
+    :param handler: The path to the handler for tokenization (must be the same one used in the training of the model)
+    :param model: A path to the model file
+    :param sentence_count: How many sentences are to be generated
+    :param output_file: An optional parameter being the path of an output file.
+    :return: The generated tweet
+    '''
+
+    if type(handler) is str and type(model) is str:
+
+        net = network.PolitiGen.load(model, handler)
+        sents = ""
+
+        for _ in range(sentence_count):
+            sents = sents + net.synthesize() + " "
+        if output_file != "none":
+            with open(output_file, "w") as df:
+                df.write(sents)
+        return sents
+
+    else:  # TODO allow for handler and model object inputs and change doc comment
+        raise ValueError("Invalid path to model and or handler given")
+
+def loadModel(handler, modelPath):
+    '''
+    Function to load a generator model of specified path
+    :param handler: The handler to be used with the model
+    :param modelPath: The path of the saved model
+    :return: The model object
+    '''
+    return network.PolitiGen.load(modelPath, handler)
+
