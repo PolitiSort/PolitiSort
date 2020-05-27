@@ -7,7 +7,7 @@ from keras.optimizers import Adam
 from contextlib import redirect_stdout
 from keras.layers import Input, Dense, Masking, LSTM, Lambda, Dropout, Conv1D, BatchNormalization, ZeroPadding1D, Flatten, UpSampling1D, Reshape, concatenate, LeakyReLU 
 # Dependencies used in the version of Politisort that takes Bios into account
-from keras.layers import UpSampling2D, Conv2D, LeakyReLU, Activation
+from keras.layers import UpSampling2D, Conv2D, Activation
 
 
 import keras.backend as K
