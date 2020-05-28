@@ -50,7 +50,9 @@ elif command == "train":
     net.train(epochs=epochs, iterations=iterations, batch_size=batch_size, reporting=reporting_count)
     net.save(args.output)
 elif command == "make":
-    net = PolitiGen.load(args.seed, args.input)
+    with open(args.input, "rb") as df:
+        hdlr = pickle.load(df)
+    net = PolitiGen.load(args.seed, hdlr)
     sents = ""
     for _ in range(args.sentcount):
         sents = sents + net.synthesize() + " "

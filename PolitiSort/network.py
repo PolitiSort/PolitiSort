@@ -42,15 +42,20 @@ class PolitiGen(object):
         # Expand the sequential input to temporal convolution slices by expanding dims
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1))) # [1, 2, 3] => [[1], [2], [3]]
         # <Conv1D Net>
-        model.add(Conv1D(64, 5, activation=LeakyReLU()))
-        model.add(Conv1D(128, 3, activation=LeakyReLU()))
+        model.add(Conv1D(64, 5))
+        model.add(LeakyReLU())
+        model.add(Conv1D(128, 3))
+        model.add(LeakyReLU())
         # </Conv1D Net>
         # Flatten ConvNet into Sequential Object
         model.add(Flatten())
         # <DNN>
-        model.add(Dense(64, activation=LeakyReLU()))
-        model.add(Dense(16, activation=LeakyReLU()))
-        model.add(Dense(8, activation=LeakyReLU()))
+        model.add(Dense(64))
+        model.add(LeakyReLU())
+        model.add(Dense(16))
+        model.add(LeakyReLU())
+        model.add(Dense(8))
+        model.add(LeakyReLU())
         model.add(Dense(1, activation='sigmoid'))
         # </DNN>
         return model
