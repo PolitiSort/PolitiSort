@@ -153,11 +153,11 @@ class PolitiGen(object):
         return net
 
     def save(self, directory):
-        self.comb.save(directory)
+        self.gen.save(directory)
 
     def synthesize(self, length=None):
         if not length:
-            length = random.randint(5, 54)
+            length = random.randint(5, 10)
 
         inp, _, _, _, _, _ = self.handler.step(2)
         generated_results = self.gen.predict(inp)
@@ -166,15 +166,16 @@ class PolitiGen(object):
             generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
         generated_pairs_translated = self.handler.translate(generated_pairs[0])
         sent = generated_pairs_translated[0] + " " + generated_pairs_translated[1]
-        inp = generated_results
+        inp = self.handler.conform(generated_results)
         for _ in range(length-1):
             generated_results = self.gen.predict(np.array(inp))
-            inp = generated_results
+            inp = self.handler.conform(generated_results)
             generated_pairs = []
             for indx, e in enumerate(generated_results):
                 generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
             generated_pairs_translated = self.handler.translate(generated_pairs[0])
             sent = sent + " " + generated_pairs_translated[1]
+        return sent
 
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
         """

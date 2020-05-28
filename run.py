@@ -55,7 +55,7 @@ elif command == "make":
     net = PolitiGen.load(args.seed, hdlr)
     sents = ""
     for _ in range(args.sentcount):
-        sents = sents + net.synthesize() + " "
+        sents = sents + net.synthesize() + "\n"
     with open(args.output, "w") as df:
         df.write(sents)
 
