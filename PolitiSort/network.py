@@ -42,16 +42,15 @@ class PolitiGen(object):
         # Expand the sequential input to temporal convolution slices by expanding dims
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1))) # [1, 2, 3] => [[1], [2], [3]]
         # <Conv1D Net>
-        model.add(Conv1D(64, 5))
+        model.add(Conv1D(16, 2))
         model.add(LeakyReLU())
-        model.add(Conv1D(128, 3))
+        model.add(Conv1D(8, 5))
         model.add(LeakyReLU())
+
         # </Conv1D Net>
         # Flatten ConvNet into Sequential Object
         model.add(Flatten())
         # <DNN>
-        model.add(Dense(64))
-        model.add(LeakyReLU())
         model.add(Dense(16))
         model.add(LeakyReLU())
         model.add(Dense(8))
@@ -73,23 +72,20 @@ class PolitiGen(object):
         # Expand the sequential input to temporal convolution slices by expanding dims
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1))) # [1, 2, 3] => [[1], [2], [3]]
         # <Conv1D Net>
-        model.add(Conv1D(128, 3))
-        model.add(Conv1D(64, 5))
+        model.add(Conv1D(16, 2))
+        model.add(LeakyReLU())
+        model.add(Conv1D(8, 5))
+        model.add(LeakyReLU())
         # </Conv1D Net>
-        # Upsample the data to force synthesis
-        model.add(UpSampling1D(size=4))
-        # <Conv1D Net>
-        model.add(Conv1D(64, 7))
-        model.add(Conv1D(32, 9))
-        # </Conv1D Net>
-        # Upsample the data to force synthesis
-        model.add(UpSampling1D())
         # Flatten ConvNet into Sequential Object
         model.add(Flatten())
         # <DNN>
-        model.add(Dense(568))
-        model.add(Dense(256))
+        model.add(Dense(32))
+        model.add(LeakyReLU())
+        model.add(Dense(64))
+        model.add(LeakyReLU())
         model.add(Dense(100))
+        model.add(LeakyReLU())
         # </DNN>
         return model
 
@@ -100,7 +96,7 @@ class PolitiGen(object):
         :returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(5e-4)
+        optimizer = Adam(3e-3)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
