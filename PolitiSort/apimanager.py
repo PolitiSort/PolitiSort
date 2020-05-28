@@ -10,13 +10,10 @@ def scrape(users, output_file, key):
     :param users: The snowflakes of the accounts that are to be scraped for their tweets.
     :param output_file: The destination file that this data is to be scraped to.
     :param key: Key used to scrape Twitter.
-    :return: True or False depending on if it works or not
+    :return: Nothing
     '''
-    try:
-        hydrate.run(users, output_file, key)
-        return True
-    except:
-        return False
+    hydrate.run(users, output_file, key)
+
 
 
 def train_model(epochs, iterations, batch_size, reporting_count, handler, modelSaveFile = "do not save"):

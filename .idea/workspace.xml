@@ -36,16 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/packages.txt">
           <provider selected="true" editor-type-id="text-editor">
-<<<<<<< HEAD
             <state relative-caret-position="19">
               <caret line="1" column="48" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="48" />
-=======
-            <state relative-caret-position="1244">
-              <caret line="66" column="47" lean-forward="true" selection-start-line="66" selection-start-column="47" selection-end-line="66" selection-end-column="47" />
-              <folding>
-                <element signature="e#0#78#0" expanded="true" />
-              </folding>
->>>>>>> c6d5a22... Finished API functions and refactored names to fit the PEP8 formatting convention
             </state>
           </provider>
         </entry>
@@ -390,7 +382,6 @@
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -398,15 +389,6 @@
             <caret line="61" column="44" lean-forward="true" selection-start-line="61" selection-start-column="44" selection-end-line="61" selection-end-column="44" />
           </first_editor>
           <second_editor />
-=======
-    <entry file="file://$PROJECT_DIR$/PolitiSort/apimanager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1244">
-          <caret line="66" column="47" lean-forward="true" selection-start-line="66" selection-start-column="47" selection-end-line="66" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#78#0" expanded="true" />
-          </folding>
->>>>>>> c6d5a22... Finished API functions and refactored names to fit the PEP8 formatting convention
         </state>
       </provider>
     </entry>
