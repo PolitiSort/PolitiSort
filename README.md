@@ -1,48 +1,55 @@
 # PolitiSort
-Sort and generate your stance, automagically with Politisort. 
+Sort and generate your stance, automagically with PolitiSort. 
 
 ## Overview
-
-Politisort is a project containing two seperate efforts. The Politisort part of this project aims to detect the political stance of a tweet. The Politigen part of this project aims to generate politically biased tweets. Both of these parts have been trained off of a dataset created by scraping the twitter account of each current senator.
-
-
+PolitiSort is a project containing two seperate efforts. The PolitiSort part of this project aims to detect the political stance of a tweet. The PolitiGen part of this project aims to generate politically biased tweets. Both of these parts have been trained off of a dataset created by scraping the twitter account of each current senator.
 
 
 ## Setup and Installation
+
 The first step is to clone the repository using  the following command:
 
-```
+```bash
 git clone https://github.com/PolitiSort/PolitiSort.git
  ```
 
-Next, change directorys into the repository using:
+Change into that folder like so:
 
-```
-cd Politisort
-```
-
-The next step is to install all the dependencies of this project. You can do this with Conda by doing:
-
-``` 
-conda create --name Politisort --file packages.txt
+```bash
+cd PolitiSort
 ```
 
-There is no current easy way to install all the dependencies with pip, so i'm afraid that pip users will have to manually install each dependency. Alternatively, you could use Conda!
-At this point you should be ready to run the project. All that needs to be done in that case is the running run.py using:
+The next step is to install all the dependencies of this project. You can do this with Conda (recommended, we use Conda anyways) by doing:
+
+```bash
+conda create --name PolitiSort --file packages.txt
+```
+
+There is no current easy way to install all the dependencies with pip, so I'm afraid that pip users will have to manually install each dependency. Alternatively, you could use Conda! 
+
+**A Note About Numpy**: some of us have experienced issues with the model actually running when on the Numpy version in the dependencies list. The error message usually goes something about the fact that *Numpy can't load a pickle when `allow_pickle=False`*. Unfortunately, gensim, the topic modeling package we use, can't seem to play well with Numpy on some versions. The way we fixed it is to simply navigate to the offending file (inside the gensim package!), and pass `allow_pickle=True.` This should only occur when training a new GANHandler.
+
+**A Note About GANHandler**: this project requires a compiled data format, GANHandler, to train the model. The file is a pickle containing an instance of the GANHandler class, which includes utility functions to load the data, generate bigrams, encode/decode the data, etc. This could be created from run.py.
+
+At this point you should be ready to run the project. All that needs to be done in that case is the running run.py. From that script, you should be able to...
+
+1. Create new datasets from a list of Twitter users
+2. Compile new GANNHandlers from dataset CSVs
+3. Train a model!
+4. Make sentences with the model
+
+The CLI syntax on how to do all of that could be found using the command:
 
 ```
-python3 run.py
+python3 run.py -h
 ```
 
-This should automatically begin training the GAN model in this project. If you encounter errors, solve them.
 
-## Politigen vs Politisort
+If you encounter errors, solve them, I guess.
 
-This repository has two different projects: Politisort and Politigen. At the moment, the run.py file will compile and train the Politigen model in the master branch. If you wish to train and run the Politisort model, checkout to the Politisort branch. In the future, these branches are likely to be merged and run.py will likely have system arguments. Running run.py in any branch using the following command will train the model:
+## PolitiGen vs PolitiSort
 
-```
-python3 run.py
-```
+This repository has two different projects: PolitiSort and PolitiGen. The former is a LSTM-based network to do political stance sorting, the latter a GAN to generate tweets using a Markov chain. At the moment, the run.py file will work with the PolitiGen model in the master branch. If you wish to train and run the PolitiSort model, checkout to the PolitiSort branch. Unfortunately we won't be building a CLI for PolitiSort at the moment, but you could still use the reasonably commented API in PolitiSort.network.PolitiNet.
 
 To store the trained model, use the Keras save trainable weights method like this:
 
@@ -50,13 +57,16 @@ To store the trained model, use the Keras save trainable weights method like thi
 myTrainedModel.save_weights('my_model_weights.h5')
 ```
 
-Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. In the case of the GAN, you would likely wish to purely store the generator model under the politigen class. For storing the Politisort model, you would likely want to store the model under Politinet and simply use the model predict method as shown below:
+Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. In the case of the GAN, you would likely wish to purely store the generator model under the politigen class. For storing the PolitiSort model, you would likely want to store the model under PolitiNet and simply use the model predict method as shown below:
 
 ```python
-PolitisortNetwork = Politnet()
-model = PolitisortNetwork.model
+PolitiSortNetwork = PolitNet()
+model = PolitiSortNetwork.model
 model.load_weights('my_model.h5')
 model.predict(someValidTokenizedTweet)
 ```
 
-*Note: inputs to the Politisort model will be tokenized and outputs of the GAN model will also be tokenized. If saving those models, it may be wise to save the token library as well in the io.py file under Politisort/data.*
+*Note: inputs to the PolitiSort model will be tokenized and outputs of the GAN model will also be tokenized. If saving those models, it may be wise to save the token library as well in the io.py file under PolitiSort/data.*
+
+
+--with :heart: and :green_salad: from @Jemoka ond @zbuster05
