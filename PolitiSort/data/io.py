@@ -2,7 +2,7 @@ import csv
 import random
 import numpy as np
 from tqdm import tqdm
-from gensim.models import word2vec
+from gensim.models import Word2Vec
 from keras.preprocessing.sequence import pad_sequences
 from collections import defaultdict
 
@@ -11,7 +11,7 @@ class Tokenizer(object):
         self.__vocab = {0:"{{URL}}"}
         self.__vocab_rev = {"{{URL}}":0}
         self.__counter = 1
-        self.__embedding = word2vec.Word2Vec.load(embedding_vector_file)
+        self.__embedding = Word2Vec.load(embedding_vector_file)
 
     @property
     def _counter(self):
@@ -20,6 +20,10 @@ class Tokenizer(object):
     def get_word(self, vector:np.ndarray):
         word = self.__embedding.similar_by_vector((vector*10)-10)[0][0]
         return word
+
+    def conform(self, vector:np.ndarray):
+        word = self.__embedding.similar_by_vector((vector*10)-10)[0][0]
+        return self.__embedding[word]
 
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
@@ -69,6 +73,9 @@ class GANHandler(object):
     def translate(self, gen_pairs:list):
         gen_pairs = np.split(gen_pairs, 2)
         return [self.tokenizer.get_word(e) for e in gen_pairs]
+
+    def conform(self, gen_results:list):
+        return [self.tokenizer.conform(e) for e in gen_results]
 
     def step(self, batch_size):
         assert self.__isCompiled, "Uncompiled Handler! Call GANHandler().compile()"
