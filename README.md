@@ -44,14 +44,21 @@ The CLI syntax on how to do all of that could be found using the command:
 python3 run.py -h
 ```
 
-
-If you encounter errors, solve them. We believe in you!
+If you encounter errors, solve them. We believe in you! (Or add it to Issues, you decide.)
 
 ## PolitiGen vs PolitiSort
 
-This repository has two different projects: PolitiSort and PolitiGen. The former is a LSTM-based network to do political stance sorting, the latter a GAN to generate tweets using a Markov chain. At the moment, the run.py file will work with the PolitiGen model in the master branch. If you wish to train and run the PolitiSort model, checkout to the PolitiSort branch. Unfortunately we won't be building a CLI for PolitiSort at the moment, but you could still use the reasonably commented API in PolitiSort.network.PolitiNet.
+This repository has two different projects: PolitiSort and PolitiGen. The former is a LSTM-based network to do political stance sorting, the latter a GAN to generate tweets using a Markov chain. At the moment, the run.py file will work with the PolitiGen model in the master. For the PolitiNet model, please checkout to the net-v0 branch. We won't be building a CLI/API for PolitiSort at the moment, but you could still use the reasonably commented library methods in PolitiSort.network.PolitiNet.
 
-To store the trained model, use the Keras save trainable weights method like this:
+## Model Storage
+
+To store the PolitiGen model, refer to the PolitiGen API/CLI documentation at 
+
+```bash
+python3 run.py -h
+```
+
+To store the trained PolitiNet model, use the Keras save trainable weights method like this:
 
 ```python
 myTrainedModel.save_weights('my_model_weights.h5')
