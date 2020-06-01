@@ -34,7 +34,7 @@ There is no current easy way to install all the dependencies with pip, so I'm af
 At this point you should be ready to run the project. All that needs to be done in that case is the running run.py. From that script, you should be able to...
 
 1. Create new datasets from a list of Twitter users
-2. Compile new GANNHandlers from dataset CSVs
+2. Compile new GANHandlers from dataset CSVs
 3. Train a model!
 4. Make sentences with the model
 
