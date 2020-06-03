@@ -57,7 +57,7 @@ To store the trained model, use the Keras save trainable weights method like thi
 myTrainedModel.save_weights('my_model_weights.h5')
 ```
 
-Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. In the case of the GAN, you would likely wish to purely store the generator model under the politigen class. For storing the PolitiSort model, you would likely want to store the model under PolitiNet and simply use the model predict method as shown below:
+Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. For storing the PolitiSort model, you would likely want to store the model under PolitiNet and simply use the model predict method as shown below:
 
 ```python
 PolitiSortNetwork = PolitNet()
