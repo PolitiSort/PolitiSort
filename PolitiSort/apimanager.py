@@ -7,7 +7,7 @@ def scrape(users, output_file, key):
     '''
     Function scrape scrapes Twitter using the provided snowflakes into a provided file using a provided key
 
-    :param users: The snowflakes of the accounts that are to be scraped for their tweets.
+    :param users: An array of snowflakes of the accounts that are to be scraped for their tweets.
     :param output_file: The destination file that this data is to be scraped to.
     :param key: Key used to scrape Twitter.
     :return: Nothing
@@ -44,7 +44,7 @@ def train_model(epochs, iterations, batch_size, reporting_count, handler, modelS
     return net
 
 
-def compile_handler(input_file, output_file="do not save"):
+def compile_handler(input_file, tokenizer, output_file="do not save"):
     '''
     The compile function takes the passed CSV and creates a handler that will then be dumped into a passed pickle path, or returned
 
@@ -52,7 +52,7 @@ def compile_handler(input_file, output_file="do not save"):
     :param output_file: The path of the pickle that the handler will be dumped into. If not provided it will not be pickled
     :return: Handler
     '''
-    tokenizer = io.Tokenizer("./static/1billion_word_vectors")
+    tokenizer = io.Tokenizer(tokenizer)
     handler = io.GANHandler(input_file, tokenizer)
     handler.compile()
     if output_file != "do not save":
