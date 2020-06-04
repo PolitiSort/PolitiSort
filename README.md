@@ -27,7 +27,7 @@ conda create --name PolitiSort --file packages.txt
 
 There is no current easy way to install all the dependencies with pip, so I'm afraid that pip users will have to manually install each dependency. Alternatively, you could use Conda! 
 
-**A Note About Numpy**: some of us have experienced issues with the model actually running when on the Numpy version in the dependencies list. The error message usually goes something about the fact that *Numpy can't load a pickle when `allow_pickle=False`*. Unfortunately, gensim, the topic modeling package we use, can't seem to play well with Numpy on some versions. The way we fixed it is to simply navigate to the offending file (inside the gensim package!), and pass `allow_pickle=True.` This should only occur when training a new GANHandler.
+**A Note About Numpy**: some of us have experienced issues with the model actually running when on the Numpy version in the dependencies list. The error message usually goes something about the fact that *Numpy can't load a pickle when `allow_pickle=False`*. Unfortunately, gensim, the topic modeling package we use, can't seem to play well with Numpy on some versions. The way we fixed it is to simply navigate to the offending file (inside the gensim package!), and change that line to `allow_pickle=True.` This should only occur when training a new GANHandler.
 
 **A Note About GANHandler**: this project requires a compiled data format, GANHandler, to train the model. The file is a pickle containing an instance of the GANHandler class, which includes utility functions to load the data, generate bigrams, encode/decode the data, etc. This could be created from run.py.
 
@@ -45,7 +45,7 @@ python3 run.py -h
 ```
 
 
-If you encounter errors, solve them, I guess.
+If you encounter errors, solve them. We believe in you!
 
 ## PolitiGen vs PolitiSort
 
@@ -57,7 +57,7 @@ To store the trained model, use the Keras save trainable weights method like thi
 myTrainedModel.save_weights('my_model_weights.h5')
 ```
 
-Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. In the case of the GAN, you would likely wish to purely store the generator model under the politigen class. For storing the PolitiSort model, you would likely want to store the model under PolitiNet and simply use the model predict method as shown below:
+Refer to the [Keras documentation](https://keras.io/getting_started/faq/#what-are-my-options-for-saving-models) for more details. For storing the PolitiSort model, you would likely want to store the model under PolitiNet and simply use the model predict method as shown below:
 
 ```python
 PolitiSortNetwork = PolitNet()
