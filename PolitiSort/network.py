@@ -42,16 +42,15 @@ class PolitiGen(object):
         # Expand the sequential input to temporal convolution slices by expanding dims
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1))) # [1, 2, 3] => [[1], [2], [3]]
         # <Conv1D Net>
-        model.add(Conv1D(64, 5))
+        model.add(Conv1D(16, 2))
         model.add(LeakyReLU())
-        model.add(Conv1D(128, 3))
+        model.add(Conv1D(8, 5))
         model.add(LeakyReLU())
+
         # </Conv1D Net>
         # Flatten ConvNet into Sequential Object
         model.add(Flatten())
         # <DNN>
-        model.add(Dense(64))
-        model.add(LeakyReLU())
         model.add(Dense(16))
         model.add(LeakyReLU())
         model.add(Dense(8))
@@ -73,23 +72,20 @@ class PolitiGen(object):
         # Expand the sequential input to temporal convolution slices by expanding dims
         model.add(Lambda(lambda x: K.expand_dims(x, axis=-1))) # [1, 2, 3] => [[1], [2], [3]]
         # <Conv1D Net>
-        model.add(Conv1D(128, 3))
-        model.add(Conv1D(64, 5))
+        model.add(Conv1D(16, 2))
+        model.add(LeakyReLU())
+        model.add(Conv1D(8, 5))
+        model.add(LeakyReLU())
         # </Conv1D Net>
-        # Upsample the data to force synthesis
-        model.add(UpSampling1D(size=4))
-        # <Conv1D Net>
-        model.add(Conv1D(64, 7))
-        model.add(Conv1D(32, 9))
-        # </Conv1D Net>
-        # Upsample the data to force synthesis
-        model.add(UpSampling1D())
         # Flatten ConvNet into Sequential Object
         model.add(Flatten())
         # <DNN>
-        model.add(Dense(568))
-        model.add(Dense(256))
+        model.add(Dense(32))
+        model.add(LeakyReLU())
+        model.add(Dense(64))
+        model.add(LeakyReLU())
         model.add(Dense(100))
+        model.add(LeakyReLU())
         # </DNN>
         return model
 
@@ -100,7 +96,7 @@ class PolitiGen(object):
         :returns: the generator, discriminator, and combined model objects
         """
 
-        optimizer = Adam(5e-4)
+        optimizer = Adam(3e-3)
 
         # Build and compile the discriminator
         discriminator = self.__build_discriminator()
@@ -148,11 +144,11 @@ class PolitiGen(object):
 
 
     def save(self, directory):
-        self.comb.save(directory)
+        self.gen.save(directory)
 
     def synthesize(self, length=None):
         if not length:
-            length = random.randint(5, 54)
+            length = random.randint(5, 10)
 
         inp, _, _, _, _, _ = self.handler.step(2)
         generated_results = self.gen.predict(inp)
@@ -161,15 +157,16 @@ class PolitiGen(object):
             generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
         generated_pairs_translated = self.handler.translate(generated_pairs[0])
         sent = generated_pairs_translated[0] + " " + generated_pairs_translated[1]
-        inp = generated_results
+        inp = self.handler.conform(generated_results)
         for _ in range(length-1):
             generated_results = self.gen.predict(np.array(inp))
-            inp = generated_results
+            inp = self.handler.conform(generated_results)
             generated_pairs = []
             for indx, e in enumerate(generated_results):
                 generated_pairs.append(np.hstack([inp[indx], e])) # Stack original input and output together
             generated_pairs_translated = self.handler.translate(generated_pairs[0])
             sent = sent + " " + generated_pairs_translated[1]
+        return sent
 
     def train(self, epochs=100, iterations=1024, batch_size=128, reporting=50):
         """

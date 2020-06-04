@@ -16,6 +16,7 @@ parser.add_argument("command", help="[scrape] dataset/[compile] corpus/[train] m
 parser.add_argument("-i", "--input", help="Input file path. Either the Corpus, Compiled Data, or Raw Acounts", type=str)
 parser.add_argument("-o", "--output", help="Output file path. Either the Corpus, Compiled Data, or Network HDH5", type=str)
 parser.add_argument("--trainargs", help="String shaped \"epochs iterations batch_size reporting_count\"", type=str)
+parser.add_argument("--wordvectors", help="Word vectors used when compiling a corpus. Defaults to ./static/1billion_word_vectors", type=str)
 parser.add_argument("-s", "--seed", help="Seed model for synthesis.", type=str)
 parser.add_argument("--sentcount", help="The number of sentences to make.", type=int)
 parser.add_argument("--key", help="A JSON String acquired from Twitter shaped {'CONSUMER_KEY': '', 'CONSUMER_SECRET': '', 'ACCESS_KEY': '', 'ACCESS_SECRET': ''}", type=str)
@@ -25,7 +26,7 @@ command = args.command
 if command == "scrape":
     hydrate.run(args.input, args.output, args.key)
 elif command == "compile":
-    tokenizer = Tokenizer("./static/1billion_word_vectors")
+    tokenizer = Tokenizer(args.wordvectors if args.wordvectors else "./static/1billion_word_vectors")
     handler = GANHandler(args.input, tokenizer)
     handler.compile()
     with open(args.output, "wb") as df:
@@ -56,7 +57,7 @@ elif command == "make":
     net = PolitiGen.load(args.seed, hdlr)
     sents = ""
     for _ in range(args.sentcount):
-        sents = sents + net.synthesize() + " "
+        sents = sents + net.synthesize() + "\n"
     with open(args.output, "w") as df:
         df.write(sents)
 

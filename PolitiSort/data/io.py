@@ -21,6 +21,10 @@ class Tokenizer(object):
         word = self.__embedding.similar_by_vector((vector*10)-10)[0][0]
         return word
 
+    def conform(self, vector:np.ndarray):
+        word = self.__embedding.similar_by_vector((vector*10)-10)[0][0]
+        return self.__embedding[word]
+
     def tokenize(self, string, by_char=False):
         arrayOfStrings = string.split() if not by_char else list(string)
         arrayOfNums = []
@@ -69,6 +73,9 @@ class GANHandler(object):
     def translate(self, gen_pairs:list):
         gen_pairs = np.split(gen_pairs, 2)
         return [self.tokenizer.get_word(e) for e in gen_pairs]
+
+    def conform(self, gen_results:list):
+        return [self.tokenizer.conform(e) for e in gen_results]
 
     def step(self, batch_size):
         assert self.__isCompiled, "Uncompiled Handler! Call GANHandler().compile()"
