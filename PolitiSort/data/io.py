@@ -101,16 +101,21 @@ class GANHandler(object):
                     else:
                         self.__encodedData[field].append(self.tokenizer.tokenize(row[field], by_char=True))
         for indx, i in tqdm(enumerate(self.__encodedData["status"]), total=len(self.__encodedData["status"])):
+            seqSets = []
+            history = []
             for e in range(len(i)-2):
                 check = np.hstack([self.__encodedData["status"][indx][e], self.__encodedData["status"][indx][e+1]])
-                self.__encodedData["bigrams"].append(check)
-            
+                self.__encodedData["bigrams"].append(check.copy())
+                history.append(self.__encodedData["status"][indx][e].copy())
+                seqSets.append([history.copy(), self.__encodedData["status"][indx][e+1].copy()])
+            self.__encodedData["sequencesets"].append(seqSets.copy())
         self.__encodedData["bigrams"] = np.array(self.__encodedData["bigrams"])
         self.__encodedData["statuswords"] = np.array([item for sublist in self.__encodedData["status"] for item in sublist])
         # self.__encodedData["status"] = pad_sequences(self.__encodedData["status"], maxlen)
         # self.__encodedData["description"] = pad_sequences(self.__encodedData["description"], maxlen)
 
         self.__isCompiled = True
+        breakpoint()
 
 
 class DataHandler(object):
