@@ -11,7 +11,7 @@ The first step is to clone the repository using  the following command:
 
 ```bash
 git clone https://github.com/PolitiSort/PolitiSort.git
- ```
+```
 
 Change into that folder like so:
 
@@ -19,13 +19,13 @@ Change into that folder like so:
 cd PolitiSort
 ```
 
-The next step is to install all the dependencies of this project. You can do this with Conda (recommended, we use Conda anyways) by doing:
+The next step is to install all the dependencies of this project. You can do this with Conda (we recommend using Conda anyways) by doing:
 
 ```bash
 conda create --name PolitiSort --file packages.txt
 ```
 
-There is no current easy way to install all the dependencies with pip, so I'm afraid that pip users will have to manually install each dependency. Alternatively, you could use Conda! 
+There is no current easy way to install all the dependencies with pip, so unfortunately pip users will have to manually install each dependency. Alternatively, you could use Conda! 
 
 **A Note About Numpy**: some of us have experienced issues with the model actually running when on the Numpy version in the dependencies list. The error message usually goes something about the fact that *Numpy can't load a pickle when `allow_pickle=False`*. Unfortunately, gensim, the topic modeling package we use, can't seem to play well with Numpy on some versions. The way we fixed it is to simply navigate to the offending file (inside the gensim package!), and change that line to `allow_pickle=True.` This should only occur when training a new GANHandler.
 
